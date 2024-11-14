@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard</title>
+    <link rel="stylesheet" href="{% static 'doctor_home.css' %}">
+</head>
+<body class="bg-gray-100">
+
+<div class="container">
+    <!-- Welcome Section -->
+    <div class="card">
+        <h2 class="title">Welcome, Dr. {{ doctor }}!</h2>
+        <p class="description">Here is an overview of your patients.</p>
+    </div>
+
+    <!-- Metrics Section -->
+    <div class="metrics">
+        <div class="metric-card">
+            <h3 class="metric-title">Total Patients</h3>
+            <p class="metric-value">{{ total_number_of_patients }}</p>
+        </div>
+    </div>
+
+    <!-- Assigned Patient List Section -->
+    <div class="card">
+        <h3 class="title">My Patients</h3>
+        
+        <!-- Table for assigned patient list -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Diabetes Prediction</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td>{{ patient.Name }}</td>
+                    <td>{{ patient.Age }}</td>
+                    <td>{{ patient.Result }}</td>
+                    <td>
+                        <button class="action-btn view-btn" onclick="viewPatient('{{ patient.id }}')">View Details</button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No patients assigned.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Unassigned Patient List Section -->
+    <div class="card">
+        <h3 class="title">Unassigned Patients</h3>
+        
+        <!-- Table for unassigned patient list -->
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Diabetes Prediction</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in unassigned_patients %}
+                <tr>
+                    <td>{{ patient.user }}</td>
+                    <td>{{ patient.Age }}</td>
+                    <td>{{ patient.Result }}</td>
+                    <td>
+                        <button class="action-btn assign-btn" onclick="assignPatient('{{ patient.id }}')">Assign to Me</button>
+
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No unassigned patients.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Assignment Confirmation Modal -->
+<div id="assignmentModal" class="modal">
+    <div class="modal-content">
+        <h4>Confirm Assignment</h4>
+        <p>Are you sure you want to assign this patient to yourself?</p>
+        <div class="modal-actions">
+            <button class="action-btn cancel-btn" onclick="closeModal()">Cancel</button>
+            <button class="action-btn confirm-btn" onclick="confirmAssignment()">Confirm</button>
+        </div>
+    </div>
+</div>
+
+<script>
+let selectedPatientId = null;
+
+function assignPatient(patientId) {
+    selectedPatientId = patientId;
+    document.getElementById('assignmentModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('assignmentModal').style.display = 'none';
+}
+
+function confirmAssignment() {
+    if (!selectedPatientId) return;
+    
+    fetch(`/assign-patient/${selectedPatientId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while assigning the patient.');
+    });
+    
+    closeModal();
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function viewPatient(patientId) {
+    window.location.href = `/patient-detail/${patientId}/`;
+}
+</script>
+
+</body>
+</html>
