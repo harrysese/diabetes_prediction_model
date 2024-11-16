@@ -36,21 +36,24 @@
                     <th>Age</th>
                     <th>Diabetes Prediction</th>
                     <th>Actions</th>
+                    <th>Remark</th>
                 </tr>
             </thead>
             <tbody>
                 {% for patient in patients %}
                 <tr>
-                    <td>{{ patient.Name }}</td>
+                    <td>{{ patient.user }}</td>
                     <td>{{ patient.Age }}</td>
                     <td>{{ patient.Result }}</td>
                     <td>
                         <button class="action-btn view-btn" onclick="viewPatient('{{ patient.id }}')">View Details</button>
+                        <button class="action-btn assign-btn" onclick="openRemarkModal('{{ patient.id }}')">Add Remark</button>
                     </td>
+                    <td>{{ patient.remark }}</td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="4" class="text-center">No patients assigned.</td>
+                    <td colspan="5" class="text-center">No patients assigned.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -79,7 +82,6 @@
                     <td>{{ patient.Result }}</td>
                     <td>
                         <button class="action-btn assign-btn" onclick="assignPatient('{{ patient.id }}')">Assign to Me</button>
-
                     </td>
                 </tr>
                 {% empty %}
@@ -92,14 +94,14 @@
     </div>
 </div>
 
-<!-- Assignment Confirmation Modal -->
-<div id="assignmentModal" class="modal">
+<!-- Remark Modal -->
+<div id="remarkModal" class="modal">
     <div class="modal-content">
-        <h4>Confirm Assignment</h4>
-        <p>Are you sure you want to assign this patient to yourself?</p>
+        <h4>Add Remark</h4>
+        <textarea id="remarkText" placeholder="Enter your remark here..." rows="4" style="width: 100%; padding: 10px;"></textarea>
         <div class="modal-actions">
-            <button class="action-btn cancel-btn" onclick="closeModal()">Cancel</button>
-            <button class="action-btn confirm-btn" onclick="confirmAssignment()">Confirm</button>
+            <button class="action-btn cancel-btn" onclick="closeRemarkModal()">Cancel</button>
+            <button class="action-btn confirm-btn" onclick="submitRemark()">Submit</button>
         </div>
     </div>
 </div>
@@ -107,39 +109,74 @@
 <script>
 let selectedPatientId = null;
 
-function assignPatient(patientId) {
+function openRemarkModal(patientId) {
     selectedPatientId = patientId;
-    document.getElementById('assignmentModal').style.display = 'block';
+    document.getElementById('remarkModal').style.display = 'block';
 }
 
-function closeModal() {
-    document.getElementById('assignmentModal').style.display = 'none';
+function closeRemarkModal() {
+    document.getElementById('remarkModal').style.display = 'none';
+    document.getElementById('remarkText').value = '';
 }
 
-function confirmAssignment() {
-    if (!selectedPatientId) return;
-    
-    fetch(`/assign-patient/${selectedPatientId}/`, {
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+    document.body.appendChild(toast);
+
+    // Force reflow to ensure animation will trigger
+    void toast.offsetHeight;
+
+    // Show the toast by adding 'show' class
+    toast.classList.add('show');
+
+    // Hide the toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            toast.remove();
+        }, 300); // Time for fade-out transition
+    }, 3000); // Show time
+}
+
+
+
+function submitRemark() {
+    const remarkText = document.getElementById('remarkText').value;
+    if (!remarkText.trim()) {
+        showToast('Please enter a remark.', 'error');
+        return;
+    }
+
+    if (!selectedPatientId) {
+        showToast('No patient selected.', 'error');
+        return;
+    }
+
+    closeRemarkModal(); // Close the modal right away
+
+    fetch(`/submit-remark/${selectedPatientId}`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken'),
             'Content-Type': 'application/json',
-        }
+        },
+        body: JSON.stringify({ remark: remarkText })
     })
     .then(response => response.json())
     .then(data => {
         if (data.status === 'success') {
-            location.reload();
+            showToast('Remark submitted successfully!', 'success');
+            setTimeout(()=>{location.reload();},11000);
         } else {
-            alert('Error: ' + data.message);
+            showToast('Error: ' + data.message, 'error');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('An error occurred while assigning the patient.');
+        showToast('An error occurred while submitting the remark.', 'error');
     });
-    
-    closeModal();
 }
 
 function getCookie(name) {
@@ -155,10 +192,6 @@ function getCookie(name) {
         }
     }
     return cookieValue;
-}
-
-function viewPatient(patientId) {
-    window.location.href = `/patient-detail/${patientId}/`;
 }
 </script>
 

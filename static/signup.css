@@ -3,10 +3,22 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
     background-color: #f0f0f0;
 }
-
+#notvisible{
+    display: none;
+}
+#password-container, #password-container2{
+    width: 10px;
+    height: 10px;
+}
+.passwordvisibility{
+    width: 20px;
+    right: 0;
+    top: 49%;
+    position: absolute;
+    cursor: pointer;
+}
 .form-container {
     background-color: white;
     padding: 30px;
@@ -23,6 +35,7 @@ h2 {
 
 .form-group {
     margin-bottom: 20px;
+    position: relative;
 }
 
 label {

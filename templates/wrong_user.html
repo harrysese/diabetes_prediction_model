@@ -32,7 +32,9 @@
 </head>
 <body>
     <section>
-    <h1>You need to login as a patient!</h1>
+        {%for message in messages%}
+    <h1>{{message}}</h1>
+    {%endfor%}
     <a href="/login">Return to Login Page</a>
 </section>
 </body>

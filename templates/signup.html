@@ -1,23 +1,33 @@
 <!DOCTYPE html>
 <html lang="en">
-    {%load static%}
+    {% load static %}
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
     <link rel="stylesheet" href="{% static 'signup.css' %}">
 </head>
+
 <body>
     <div class="form-container">
         <h2>Register</h2>
-        <form method="POST" action="signup">
+        <form method="POST" action="{% url 'signup' %}">
             {% csrf_token %}
             <div class="form-group">
-                {%for message in messages%}
-                {{message}}
-                {%endfor%}
+                {% for message in messages %}
+                <p class="message">{{ message }}</p>
+                {% endfor %}
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" placeholder="Enter your username" required>
+            </div>
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                <input type="text" id="firstname" name="firstname" placeholder="Enter your first name" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" id="lastname" name="lastname" placeholder="Enter your last name" required>
             </div>
             
             <div class="form-group">
@@ -25,9 +35,23 @@
                 <input type="email" id="email" name="email" placeholder="Enter your email" required>
             </div>
             
+            <p id="checkpassword" style="color: red;"></p>
             <div class="form-group">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" placeholder="Enter your password" required>
+                <div id="password-container">
+                <img src="{%static 'show.png'%}" id="visible" class="passwordvisibility" alt="eye" >
+                <img src="{%static 'hide.png'%}" class="passwordvisibility" id="notvisible" alt="eye" >
+            </div>
+            </div>
+            <div class="form-group">
+                <label for="password2">Confirm Password:</label>
+                
+                <input type="password" id="password2" name="password2" placeholder="Confirm your password" required>
+                <div id="password-container2">
+                <img src="{%static 'show.png'%}" id="visible2" class="passwordvisibility" alt="eye" >
+                <img src="{%static 'hide.png'%}"  id="notvisible2" class="passwordvisibility" alt="eye" >
+                </div>
             </div>
             
             <div class="form-group">
@@ -40,28 +64,68 @@
             </div>
             <div class="form-group">
                 <label for="patient">Available Patients:</label>
-                <select id="patient" name="patient" >
-                    {%for patient in patients%}
-                    <option value="{{patient.id}}">{{patient.user.username}}</option>
-                    {%endfor%}
+                <select id="patient" name="patient">
+                    {% for patient in patients %}
+                    <option value="{{ patient.id }}">{{ patient.user.username }}</option>
+                    {% endfor %}
                 </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="firstname">First Name:</label>
-                <input type="text" id="firstname" name="firstname" placeholder="Enter your first name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="lastname">Last Name:</label>
-                <input type="text" id="lastname" name="lastname" placeholder="Enter your last name" required>
             </div>
             
             <button type="submit">Register</button>
         </form>
     </div>
-    <script>
 
+    <script>
+        const password1 = document.querySelector('#password');
+        const password2 = document.querySelector('#password2');
+        const checkPassword = document.querySelector('#checkpassword');
+        const button = document.querySelector('button');
+        const passwordVisible=document.getElementById('visible');
+        const passwordVisible2=document.getElementById('visible2');
+        const notPasswordVisible=document.getElementById('notvisible');
+        const notPasswordVisible2=document.getElementById('notvisible2');
+        const passwordButton=document.getElementById('password-container')
+        const passwordButton2=document.getElementById('password-container2')
+        function validatePassword() {
+            if (password1.value !== password2.value) {
+                checkPassword.textContent = 'Passwords do not match';
+                button.disabled = true;
+            } else {
+                checkPassword.textContent = '';
+                button.disabled = false;
+            }
+        }
+        const togglePasswordVisibility=()=>{
+            if (password1.type==='password'){
+                console.log("it is a password")
+                password1.type='text';
+                passwordVisible.style.display='none';
+                notPasswordVisible.style.display='block';
+                
+            }
+            else{
+                password1.type='password';
+                passwordVisible.style.display='block';
+                notPasswordVisible.style.display='none';
+            }
+        }
+        const togglePasswordVisibility2=()=>{
+            if (password2.type==='password'){
+                password2.type='text';
+                passwordVisible2.style.display='none';
+                notPasswordVisible2.style.display='block';
+                
+            }
+            else{
+                password2.type='password';
+                passwordVisible2.style.display='block';
+                notPasswordVisible2.style.display='none';
+            }
+        }
+        passwordButton.addEventListener('click', togglePasswordVisibility);
+        passwordButton2.addEventListener('click', togglePasswordVisibility2);
+        password1.addEventListener('input', validatePassword);
+        password2.addEventListener('input', validatePassword);
     </script>
 </body>
 </html>

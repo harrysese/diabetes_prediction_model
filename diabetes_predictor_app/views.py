@@ -1,4 +1,5 @@
 # diabetes_predictor_app/views.py
+import json
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 import pickle
@@ -8,7 +9,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 from django.contrib import messages
 from .forms import DiabetesForm
+from django.core.mail import send_mail
 from .models import *
+from diabetes_predictor_app.email import send_remark_email
 
 # Load the saved model
 model_path = "diabetes_predictor_app/ml_models/diabetes_model.pkl"
@@ -17,6 +20,14 @@ with open(model_path, "rb") as file:
 
 
 def login(request):
+    """"
+    Args:
+    request(obj)
+    Grabs the inputted username and password from the POST object
+    and queries the database for a match.
+    If there is it calls the login method which creates a session for the user and redirects them
+    to their respective pages depending on their role
+    """
     if request.method == "POST":
         username = request.POST.get('username')
         password = request.POST.get('password')
@@ -28,7 +39,7 @@ def login(request):
                 return redirect('/')
             else:
                 
-                return redirect('doctorpage')  # Redirect to the name of the URL mapped to the index view
+                return redirect('doctor')  # Redirect to the name of the URL mapped to the index view
         else:
             messages.info(request, 'Invalid Credentials')
             return redirect('login')  # Redirect to the login URL or view name
@@ -41,6 +52,33 @@ def logout(request):
     return redirect('login')  # Redirect to the login page or any other URL
 
 
+def submitremark(request, patient_id):
+    if request.method=="POST" and request.user.role=='doctor':
+        data = json.loads(request.body)
+        remark = data.get('remark', '')  #
+        patient=get_object_or_404(Patient, id=patient_id)
+        patient.remark=remark
+        patient.save()
+        if patient.user.email:
+            try:
+                
+               send_remark_email(
+            patient=patient,
+            doctor_name=request.user.doctorprofile,
+            remark=remark
+        )
+            except Exception as e:
+                return JsonResponse({'status': 'error', 'message': f'Failed to send email: {str(e)}'}, status=500)
+        return JsonResponse({
+            'status':'success',
+            'message':'Remark assigned to patient',
+        })
+    else:
+        return JsonResponse(
+            {
+            'status':'error',
+                'message':'Invalid method!',
+        }, status=400)
 @login_required(login_url="login")
 def assign_patient(request, patient_id):
     if request.method == "POST" and request.user.role == "doctor":
@@ -67,6 +105,7 @@ def assign_patient(request, patient_id):
         'status': 'error',
         'message': 'Invalid request'
     })
+    
 @login_required(login_url="login")
 def doctor_page(request):
     if request.user.role=="doctor":
@@ -85,7 +124,8 @@ def doctor_page(request):
         }
         return render(request, 'doctor_home.html', context)  # Add .html to template name
     else:
-        return HttpResponse("Access denied!")
+        messages.error(request, "You need to login as a Doctor")
+        return redirect("wronguser")
         
       
 
@@ -107,9 +147,6 @@ def signup(request):
             messages.info(request, "Email is already taken")
             return redirect('signup')
         else:
-            # Create user and related profile based on role
-            print(f"Username: {username}, Role: {role}, Email: {email_address}")
-            
             user = User.objects.create_user(
                 first_name=first_name,
                 last_name=last_name,
@@ -165,18 +202,21 @@ def predict_diabetes(request):
                     result = "Likely Diabetic"
 
                 # Save prediction to Patient model
-                Patient.objects.create(
-                    Name=name,
-                    Pregnancies=data[0],
-                    Glucose=data[1],
-                    BloodPressure=data[2],
-                    SkinThickness=data[3],
-                    Insulin=data[4],
-                    BMI=data[5],
-                    DiabetesPedigreeFunction=data[6],
-                    Age=data[7],
-                    Result=result,
-                    Prediction=round(prediction_proba, 2)
+                Patient.objects.update_or_create(
+                    user=request.user,
+                    defaults={
+                        'Name': name,
+                        'Pregnancies': data[0],
+                        'Glucose': data[1],
+                        'BloodPressure': data[2],
+                        'SkinThickness': data[3],
+                        'Insulin': data[4],
+                        'BMI': data[5],
+                        'DiabetesPedigreeFunction': data[6],
+                        'Age': data[7],
+                        'Result': result,
+                        'Prediction': round(prediction_proba, 2)
+                    }
                 )
 
                 return render(request, 'result.html', {
@@ -189,6 +229,7 @@ def predict_diabetes(request):
 
         return render(request, 'index.html', {'form': form})
     else:
+        messages.error(request, "You need to login as a patient")
         return redirect("wronguser")
 def wronguser(request):
     return render(request, 'wrong_user.html')

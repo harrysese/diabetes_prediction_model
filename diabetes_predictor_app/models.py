@@ -42,6 +42,7 @@ class Patient(models.Model):
     Age=models.IntegerField(null=True, blank=True)
     DiabetesPedigreeFunction=models.FloatField(null=True, blank=True)
     Result=models.TextField(max_length=30,null=True, blank=True)
+    remark=models.TextField(max_length=90, null=True, blank=True)
     Prediction=models.FloatField(max_length=5,null=True, blank=True)
     created_at=models.DateTimeField(auto_now_add=True)
     def __str__(self:object) -> str:

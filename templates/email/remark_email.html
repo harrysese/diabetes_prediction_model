@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Remark</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .email-wrapper {
+            background: url('https://img.freepik.com/free-vector/autumn-background_23-2149054410.jpg?t=st=1731624688~exp=1731628288~hmac=c804fdcadfe9a59ecf6c6a8c77bd73fd883cbc3c396850bf810c4fb4ca6673aa&w=900') no-repeat center center;
+            background-size: cover;
+            padding: 40px 0;
+            text-align: center;
+        }
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        .header {
+            padding: 20px;
+            background-color: #4CAF50;
+            color: #fff;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .content {
+            padding: 30px;
+            color: #333;
+        }
+        .content h1 {
+            color: #333;
+            font-size: 26px;
+            margin-bottom: 20px;
+        }
+        .content p {
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        .remark {
+            font-style: italic;
+            color: #555;
+            font-size: 18px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-left: 4px solid #4CAF50;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .footer {
+            background-color: #4CAF50;
+            color: #fff;
+            padding: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-wrapper">
+        <div class="email-container">
+            <div class="header">Your New Remark</div>
+            <div class="content">
+                <h1>Hello {{ patient_name }},</h1>
+                <p>Dr. {{ doctor_name }} has left a new remark for you:</p>
+                <div class="remark">"{{ remark }}"</div>
+                <p>If you have any questions, please don’t hesitate to reach out to us.</p>
+            </div>
+            <div class="footer">
+                Best regards,<br>Your Healthcare Team
+            </div>
+        </div>
+    </div>
+</body>
+</html>

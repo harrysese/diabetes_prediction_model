@@ -126,9 +126,10 @@ AUTH_USER_MODEL = 'diabetes_predictor_app.User'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.mail.gmail.com'
+EMAIL_TIMEOUT = 30  # Set timeout to 30 seconds or higher
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True  # Must be False if SSL is True
 EMAIL_HOST_USER = 'usepredicare@gmail.com'  # Replace with your Yahoo email
-EMAIL_HOST_PASSWORD = 'amux grmo opny bpsf'  # Replace with your Yahoo password
+EMAIL_HOST_PASSWORD = 'amuxgrmoopnybpsf'  # Replace with your Yahoo password
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
