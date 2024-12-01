@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
-    {%load static%}
+    {% load static %}
     <title>Prediction Result</title>
-    <link rel="stylesheet" href="{%static 'result.css'%}">
+    <link rel="stylesheet" href="{% static 'result.css' %}">
 </head>
 <body>
-    <h2>Prediction Result: {{ result }} with a probability of {{probability}}%</h2>
-    <p></p>
-    <a href="{% url 'predict_diabetes' %}">Try Again</a>
+    <div>
+        <h2>Prediction Result: {{ result }} with a probability of {{ probability }}%</h2>
+        <p>Analyze your health metrics and try again if needed.</p>
+        <a href="{% url 'predict_diabetes' %}">Try Again</a>
+    </div>
 </body>
 </html>

@@ -42,6 +42,9 @@ button{
     border-radius: 5px;
     font-size: 16px;
 }
+p#signup-link{
+    padding: 10px 10px;
+}
 button:hover{
     cursor: pointer;
     background-color: #307232;

@@ -1,36 +1,51 @@
-# diabetes_predictor_app/forms.py
 from django import forms
 
 class DiabetesForm(forms.Form):
     Pregnancies = forms.IntegerField(
-        label='Number of Pregnancies',
-        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 2'})
+        label='',  # Removes label
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Number of Pregnancies (count)'
+        })
     )
     Glucose = forms.FloatField(
-        label='Glucose Level (mg/dL)',
-        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 120'})
+        label='',
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Glucose Level (mg/dL)'
+        })
     )
     BloodPressure = forms.FloatField(
-        label='Blood Pressure Diastolic (mmHg)',
-        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 80'})
+        label='',
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Blood Pressure (mmHg)'
+        })
     )
     SkinThickness = forms.FloatField(
-        label='Skin Thickness (mm)',
-        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 25'})
+        label='',
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Skin Thickness (mm)'
+        })
     )
     Insulin = forms.FloatField(
-        label='Insulin Level (mu U/mL)',
-        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 85'})
+        label='',
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Insulin Level (IU/mL)'
+        })
     )
     BMI = forms.FloatField(
-        label='BMI (kg/m²)',
-        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 24.5'})
+        label='',
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'BMI (kg/m²)'
+        })
     )
     DiabetesPedigreeFunction = forms.FloatField(
-        label='Diabetes Pedigree Function',
-        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 0.45'})
+        label='',
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Diabetes Pedigree Function (relative risk)'
+        })
     )
     Age = forms.IntegerField(
-        label='Age (years)',
-        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 45'})
+        label='',
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Age (years)'
+        })
     )
