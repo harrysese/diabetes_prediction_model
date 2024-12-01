@@ -120,6 +120,7 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS=[BASE_DIR/ 'static']
+STATIC_ROOT=os.path.join(BASE_DIR, 'staic')
 AUTH_USER_MODEL = 'diabetes_predictor_app.User'
 
 # Default primary key field type
