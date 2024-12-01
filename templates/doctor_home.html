@@ -109,6 +109,53 @@
 <script>
 let selectedPatientId = null;
 
+
+function assignPatient(patientId) {
+    selectedPatientId = patientId;
+    document.getElementById('assignmentModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('assignmentModal').style.display = 'none';
+}
+function assignPatient(patientId) {
+    selectedPatientId = patientId;
+    document.getElementById('assignmentModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('assignmentModal').style.display = 'none';
+}
+
+function viewPatient(patientId) {
+    window.location.href = `/patient-detail/${patientId}/`;
+}
+function confirmAssignment() {
+    if (!selectedPatientId) return;
+    
+    fetch(`/assign-patient/${selectedPatientId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            location.reload();
+        } else {
+            alert('Error: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while assigning the patient.');
+    });
+    
+    closeModal();
+}
+
 function openRemarkModal(patientId) {
     selectedPatientId = patientId;
     document.getElementById('remarkModal').style.display = 'block';
