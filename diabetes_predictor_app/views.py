@@ -138,7 +138,6 @@ def signup(request):
         role = request.POST.get('role')
         first_name = request.POST.get('firstname')
         last_name = request.POST.get('lastname')
-        patient=request.POST.get('patient')
         # Check for existing username or email
         if User.objects.filter(username=username).exists():
             messages.info(request, "Username already exists")
@@ -157,12 +156,8 @@ def signup(request):
             )
             
             if role == 'doctor':
-                newdoctor=DoctorProfile.objects.create(user=user, license_number=0)
-                try:
-                    assigning_doctor_to_patient=Patient.objects.get(id=patient)
-                    assigning_doctor_to_patient.doctor=newdoctor
-                except:
-                    print("No Patient exists")
+                DoctorProfile.objects.create(user=user, license_number=0)
+           
             elif role == 'patient':
                 Patient.objects.create(user=user)
             

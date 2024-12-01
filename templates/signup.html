@@ -62,14 +62,7 @@
                     <option value="admin">Admin</option>
                 </select>
             </div>
-            <div class="form-group">
-                <label for="patient">Available Patients:</label>
-                <select id="patient" name="patient">
-                    {% for patient in patients %}
-                    <option value="{{ patient.id }}">{{ patient.user.username }}</option>
-                    {% endfor %}
-                </select>
-            </div>
+  
             
             <button type="submit">Register</button>
         </form>
@@ -85,7 +78,32 @@
         const notPasswordVisible=document.getElementById('notvisible');
         const notPasswordVisible2=document.getElementById('notvisible2');
         const passwordButton=document.getElementById('password-container')
-        const passwordButton2=document.getElementById('password-container2')
+        const inputFields = document.querySelectorAll('input:not(#password):not(#password2)');
+        const passwordButton2=document.getElementById('password-container2');
+        let allFieldsFilled = true;
+        button.style.backgroundColor = '#D3D3D3'; 
+
+        const checkAllFieldsFilled=()=>{
+            let allFieldsFilled = true;
+    inputFields.forEach((input) => {
+        if (input.value.trim() === '') {
+            allFieldsFilled = false;
+        }
+    });
+
+    // Update the button style based on whether all fields are filled
+    if (allFieldsFilled) {
+        button.style.backgroundColor = '#4CAF50'; // Active color
+        button.disabled = false; // Enable the button
+    } else {
+        button.style.backgroundColor = '#D3D3D3'; // Disabled color
+        button.disabled = true; // Disable the button
+    }
+        }
+inputFields.forEach((input) => {
+  input.addEventListener('input',checkAllFieldsFilled)
+})
+
         function validatePassword() {
             if (password1.value !== password2.value) {
                 checkPassword.textContent = 'Passwords do not match';
