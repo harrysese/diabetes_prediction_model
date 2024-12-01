@@ -3,34 +3,34 @@ from django import forms
 
 class DiabetesForm(forms.Form):
     Pregnancies = forms.IntegerField(
-        label='',  # Removes label
-        widget=forms.NumberInput(attrs={'placeholder': 'Number of Pregnancies'})
+        label='Number of Pregnancies',
+        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 2'})
     )
     Glucose = forms.FloatField(
-        label='',
-        widget=forms.NumberInput(attrs={'placeholder': 'Glucose Level'})
+        label='Glucose Level (mg/dL)',
+        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 120'})
     )
     BloodPressure = forms.FloatField(
-        label='',
-        widget=forms.NumberInput(attrs={'placeholder': 'Blood Pressure'})
+        label='Blood Pressure Diastolic (mmHg)',
+        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 80'})
     )
     SkinThickness = forms.FloatField(
-        label='',
-        widget=forms.NumberInput(attrs={'placeholder': 'Skin Thickness'})
+        label='Skin Thickness (mm)',
+        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 25'})
     )
     Insulin = forms.FloatField(
-        label='',
-        widget=forms.NumberInput(attrs={'placeholder': 'Insulin Level'})
+        label='Insulin Level (mu U/mL)',
+        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 85'})
     )
     BMI = forms.FloatField(
-        label='',
-        widget=forms.NumberInput(attrs={'placeholder': 'BMI'})
+        label='BMI (kg/m²)',
+        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 24.5'})
     )
     DiabetesPedigreeFunction = forms.FloatField(
-        label='',
-        widget=forms.NumberInput(attrs={'placeholder': 'Diabetes Pedigree Function'})
+        label='Diabetes Pedigree Function',
+        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 0.45'})
     )
     Age = forms.IntegerField(
-        label='',
-        widget=forms.NumberInput(attrs={'placeholder': 'Age'})
+        label='Age (years)',
+        widget=forms.NumberInput(attrs={'placeholder': 'e.g., 45'})
     )
