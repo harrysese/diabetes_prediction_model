@@ -8,6 +8,7 @@ Django==5.1.1
 filelock==3.16.1
 fonttools==4.53.1
 fsspec==2024.9.0
+gunicorn==23.0.0
 huggingface-hub==0.25.1
 idna==3.10
 imbalanced-learn==0.12.4
