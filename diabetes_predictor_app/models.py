@@ -2,7 +2,6 @@ from django.contrib.auth.models import AbstractUser, Group, Permission
 from django.db import models
 
 class User(AbstractUser):
-    # Additional fields for your custom user model can be defined here.
     role = models.CharField(max_length=10, choices=[('doctor', 'Doctor'), ('patient', 'Patient'), ('admin', 'Admin')])
     
     # Overriding `groups` and `user_permissions` to avoid clashes

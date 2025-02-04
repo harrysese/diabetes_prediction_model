@@ -1,11 +1,11 @@
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 
-def send_remark_email(patient, doctor_name, remark):
+def send_remark_email(patient, doctor_name, remark, email):
     # Define the subject and recipient(s)
     subject = f'New Remark from Dr. {doctor_name}'
     from_email = 'usepredicare@gmail.com'
-    to_email = ["tokonisese@gmail.com"]
+    to_email = [email]
     
     # Define the context for the template
     context = {

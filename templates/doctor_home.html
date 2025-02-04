@@ -9,91 +9,141 @@
 </head>
 <body class="bg-gray-100">
 
-<div class="container">
-    <!-- Welcome Section -->
-    <div class="card">
-        <h2 class="title">Welcome, Dr. {{ doctor }}!</h2>
-        <p class="description">Here is an overview of your patients.</p>
+<div class="dashboard-container">
+        <!-- Header Section -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="welcome-message">👋 Welcome, Dr. {{ doctor }}</h1>
+                <div class="header-actions">
+                    <div class="metric-chip">
+                        <span class="metric-label">Patients Under Care</span>
+                        <span class="metric-value pulse">{{ total_number_of_patients }}</span>
+                    </div>
+                    <button class="action-btn new-patient-btn">
+                        <span class="icon-plus">+</span> New Case
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="dashboard-main">
+            <!-- Patient Grid -->
+            <section class="patient-grid">
+                <!-- My Patients Section -->
+                <div class="section-header">
+                    <h2>🩺 My Patients</h2>
+                    <div class="search-bar">
+                        <input type="text" placeholder="Search patients..." class="search-input">
+                        <span class="search-icon">🔍</span>
+                    </div>
+                </div>
+                
+                <div class="grid-container">
+                    {% for patient in patients %}
+                    <div class="patient-card">
+                        <div class="patient-header">
+                            <div class="avatar">{{patient.initials}}
+                            </div>
+                            <div class="patient-info">
+                                <h3>{{ patient.user }}</h3>
+                                <p class="patient-age">Age {{ patient.Age }}</p>
+                            </div>
+                            <span class="status-indicator {{ patient.Result|lower }}"></span>
+                        </div>
+                        
+                        <div class="patient-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Last Check</span>
+                                <span class="detail-value">{{patient.created_at}}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Risk Level</span>
+                                <span class="risk-level {{ patient.Result|lower }}">{{ patient.Result }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="patient-actions">
+                            <button class="action-btn view-btn" onclick="viewPatient('{{ patient.id }}')">
+                                Full History
+                            </button>
+                            <button class="action-btn remark-btn" onclick="openRemarkModal('{{ patient.id }}')">
+                                Add Note
+                            </button>
+                        </div>
+                        
+                        {% if patient.remark %}
+                        <div class="patient-notes">
+                            <div class="note-bubble">
+                                <span class="note-icon">📝</span>
+                                {{ patient.remark|truncatechars:40 }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <img src="{% static 'empty-state.svg' %}" alt="No patients" class="empty-illustration">
+                        <p>No patients currently under your care</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Unassigned Patients Section -->
+                <div class="section-header">
+                    <h2>📥 Unassigned Cases</h2>
+                    <span class="badge">{{ unassigned_patients|length }} pending</span>
+                </div>
+                
+                <div class="unassigned-list">
+                    {% for patient in unassigned_patients %}
+                    <div class="case-card">
+                        <div class="case-header">
+                            <div class="case-urgency"></div>
+                            <h4>{{ patient.user }}</h4>
+                            <span class="case-age">Age {{ patient.Age }}</span>
+                        </div>
+                        <div class="case-preview">
+                            <span class="prediction-tag {{ patient.Result|lower }}">
+                                {{ patient.Result }}
+                            </span>
+                            <button class="action-btn assign-btn" 
+                                    onclick="assignPatient('{{ patient.id }}')">
+                                Claim Case
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="empty-state">
+                        <p>All cases have been assigned 🎉</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Patient Preview Sidebar -->
+            <aside class="patient-preview">
+                <div class="preview-header">
+                    <h3>Selected Patient</h3>
+                    <span class="close-preview">×</span>
+                </div>
+                <div class="preview-content">
+                    <!-- Dynamic content loaded via JS -->
+                </div>
+            </aside>
+        </main>
     </div>
 
-    <!-- Metrics Section -->
-    <div class="metrics">
-        <div class="metric-card">
-            <h3 class="metric-title">Total Patients</h3>
-            <p class="metric-value">{{ total_number_of_patients }}</p>
+<div id="assignmentModal" class="modal">
+    <div class="modal-content">
+            <h4>Confirm Assignment</h4>
+            <p>Are you sure you want to assign this patient to yourself?</p>
+            <div class="modal-actions">
+                <button class="action-btn cancel-btn" onclick="closeModal()">Cancel</button>
+                <button class="action-btn confirm-btn" onclick="confirmAssignment()">Confirm</button>
+            </div>
         </div>
-    </div>
-
-    <!-- Assigned Patient List Section -->
-    <div class="card">
-        <h3 class="title">My Patients</h3>
-        
-        <!-- Table for assigned patient list -->
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Age</th>
-                    <th>Diabetes Prediction</th>
-                    <th>Actions</th>
-                    <th>Remark</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for patient in patients %}
-                <tr>
-                    <td>{{ patient.user }}</td>
-                    <td>{{ patient.Age }}</td>
-                    <td>{{ patient.Result }}</td>
-                    <td>
-                        <button class="action-btn view-btn" onclick="viewPatient('{{ patient.id }}')">View Details</button>
-                        <button class="action-btn assign-btn" onclick="openRemarkModal('{{ patient.id }}')">Add Remark</button>
-                    </td>
-                    <td>{{ patient.remark }}</td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center">No patients assigned.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-
-    <!-- Unassigned Patient List Section -->
-    <div class="card">
-        <h3 class="title">Unassigned Patients</h3>
-        
-        <!-- Table for unassigned patient list -->
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Age</th>
-                    <th>Diabetes Prediction</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for patient in unassigned_patients %}
-                <tr>
-                    <td>{{ patient.user }}</td>
-                    <td>{{ patient.Age }}</td>
-                    <td>{{ patient.Result }}</td>
-                    <td>
-                        <button class="action-btn assign-btn" onclick="assignPatient('{{ patient.id }}')">Assign to Me</button>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center">No unassigned patients.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
 </div>
-
 <!-- Remark Modal -->
 <div id="remarkModal" class="modal">
     <div class="modal-content">
@@ -118,22 +168,19 @@ function assignPatient(patientId) {
 function closeModal() {
     document.getElementById('assignmentModal').style.display = 'none';
 }
-function assignPatient(patientId) {
-    selectedPatientId = patientId;
-    document.getElementById('assignmentModal').style.display = 'block';
-}
+
 
 function closeModal() {
     document.getElementById('assignmentModal').style.display = 'none';
 }
 
 function viewPatient(patientId) {
-    window.location.href = `/patient-detail/${patientId}/`;
+    window.location.href = `/patient-detail/${patientId}`;
 }
 function confirmAssignment() {
     if (!selectedPatientId) return;
     
-    fetch(`/assign-patient/${selectedPatientId}/`, {
+    fetch(`/assign-patient/${selectedPatientId}`, {
         method: 'POST',
         headers: {
             'X-CSRFToken': getCookie('csrftoken'),

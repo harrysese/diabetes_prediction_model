@@ -107,57 +107,6 @@ body {
     cursor: pointer;
     transition: transform 0.3s ease;
 }
-/* Add to login.css */
-.password-toggle {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-}
-
-.toggle-icon {
-    width: 20px;
-    height: 20px;
-    opacity: 0.6;
-    transition: opacity 0.3s ease;
-}
-
-.toggle-icon:hover {
-    opacity: 1;
-}
-
-select {
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    width: 100%;
-    padding: 15px;
-    border: none;
-    background: #f0f0f0;
-    border-radius: 10px;
-    font-size: 16px;
-    transition: all 0.3s ease;
-}
-
-select:focus {
-    outline: none;
-    background: #fff;
-    box-shadow: 0 0 0 2px #667eea;
-}
-
-.message {
-    color: #e74c3c;
-    margin: 15px 0;
-    text-align: center;
-    font-size: 14px;
-    animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
 
 .login-button:hover {
     transform: scale(1.02);

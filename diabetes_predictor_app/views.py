@@ -1,10 +1,10 @@
-# diabetes_predictor_app/views.py
 import json
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 import pickle
 import numpy as np
-from django.shortcuts import render, redirect, HttpResponse
+from django.http import HttpRequest
+from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login as auth_login, logout as auth_logout, authenticate
 from django.contrib import messages
@@ -12,18 +12,41 @@ from .forms import DiabetesForm
 from django.core.mail import send_mail
 from .models import *
 from diabetes_predictor_app.email import send_remark_email
-
+from typing import List, Union
 # Load the saved model
 model_path = "diabetes_predictor_app/ml_models/diabetes_model.pkl"
 with open(model_path, "rb") as file:
     model = pickle.load(file)
 
+def patient_detail(request:HttpRequest, patient_id:int):
+    patient=get_object_or_404(Patient, id=patient_id)
+    print(patient.user.email)
+    print(patient.id
+          )
+    context={
+            'name':f"{patient.user.first_name} {patient.user.last_name}",
+            'pregnancies':patient.Pregnancies,
+            'glucose':patient.Glucose,
+            'bloodpressure':patient.BloodPressure,
+            'skinthickness':patient.SkinThickness,
+            'bmi':patient.BMI,
+            'insulin':patient.Insulin,
+            'age':patient.Age,
+            'diabetespedigreefunction':patient.DiabetesPedigreeFunction,
+            'result':patient.Result,
+            'remark':patient.remark,
+            'prediction': patient.Prediction,
+            'id':patient.id
+        }
+    return render(request, 'patient_detail.html', context)
+    
 
-def login(request):
+
+def login(request:HttpRequest):
     """"
     Args:
     request(obj)
-    Grabs the inputted username and password from the POST object
+    Grabs the inputted username and password from the POST HttpRequest
     and queries the database for a match.
     If there is it calls the login method which creates a session for the user and redirects them
     to their respective pages depending on their role
@@ -47,7 +70,7 @@ def login(request):
         return render(request, 'login.html')
 
 
-def logout(request):
+def logout(request:HttpRequest):
     auth_logout(request)  # Use auth_logout to avoid conflict with view name
     return redirect('login')  # Redirect to the login page or any other URL
 
@@ -65,7 +88,8 @@ def submitremark(request, patient_id):
                send_remark_email(
             patient=patient,
             doctor_name=request.user.doctorprofile,
-            remark=remark
+            remark=remark,
+            email=patient.user.email
         )
             except Exception as e:
                 return JsonResponse({'status': 'error', 'message': f'Failed to send email: {str(e)}'}, status=500)
@@ -116,13 +140,15 @@ def doctor_page(request):
         patients = Patient.objects.filter(doctor=doctor_profile)
         unassigned_patients=Patient.objects.filter(doctor__isnull=True)
         total_number_of_patients=patients.count()
+        for patient in patients:
+            patient.initials = f"{patient.user.first_name[0].upper()}{patient.user.last_name[0].upper()}"
         context = {
             'patients': patients,
             'doctor':doctor_profile,
             'total_number_of_patients':total_number_of_patients,
             'unassigned_patients':unassigned_patients,
         }
-        return render(request, 'doctor_home.html', context)  # Add .html to template name
+        return render(request, 'doctor_home.html', context)  
     else:
         messages.error(request, "You need to login as a Doctor")
         return redirect("wronguser")

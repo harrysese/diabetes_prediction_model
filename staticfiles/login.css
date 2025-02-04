@@ -1,51 +1,202 @@
-*{
+* {
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
     box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
-body{
+
+body {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: antiquewhite;
-    height: 100vh;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
-form{
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    max-width: 400px;
-    background-color: white;
+
+.login-container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    width: 90%;
+    max-width: 450px;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
 }
-input{
-    border: 1px solid grey;
-    border-radius: 5px;
-    margin-top: 5px;
-    padding: 12px;
+
+.login-container:hover {
+    transform: translateY(-5px);
 }
-section.form-group{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+
+.login-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.login-header h1 {
+    color: #333;
+    font-size: 2em;
     margin-bottom: 10px;
 }
-button{
+
+.input-group {
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.input-group input {
     width: 100%;
-    padding: 12px;
-    background-color: #4CAF50;
-    color: white;
+    padding: 15px;
     border: none;
-    border-radius: 5px;
+    background: #f0f0f0;
+    border-radius: 10px;
     font-size: 16px;
+    transition: all 0.3s ease;
 }
-p#signup-link{
-    padding-top: 10px ;
+
+.input-group input:focus {
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 2px #667eea;
 }
-button:hover{
+
+.input-group label {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.input-group input:focus ~ label,
+.input-group input:valid ~ label {
+    top: -10px;
+    left: 5px;
+    font-size: 12px;
+    color: #667eea;
+}
+
+.remember-forgot {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+    font-size: 14px;
+}
+
+.remember-forgot a {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.remember-forgot a:hover {
+    color: #667eea;
+}
+
+.login-button {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
     cursor: pointer;
-    background-color: #307232;
+    transition: transform 0.3s ease;
+}
+/* Add to login.css */
+.password-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+}
+
+.toggle-icon {
+    width: 20px;
+    height: 20px;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+}
+
+.toggle-icon:hover {
+    opacity: 1;
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    width: 100%;
+    padding: 15px;
+    border: none;
+    background: #f0f0f0;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+select:focus {
+    outline: none;
+    background: #fff;
+    box-shadow: 0 0 0 2px #667eea;
+}
+
+.message {
+    color: #e74c3c;
+    margin: 15px 0;
+    text-align: center;
+    font-size: 14px;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.login-button:hover {
+    transform: scale(1.02);
+}
+
+.signup-link {
+    text-align: center;
+    margin-top: 25px;
+    color: #666;
+}
+
+.signup-link a {
+    color: #667eea;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.social-login {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.social-button {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.social-button:hover {
+    border-color: #667eea;
+    transform: translateY(-2px);
+}
+
+.social-button img {
+    width: 20px;
+    height: 20px;
 }

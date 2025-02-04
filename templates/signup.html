@@ -1,150 +1,221 @@
 <!DOCTYPE html>
 <html lang="en">
-    {% load static %}
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  {% load static %}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register</title>
-    <link rel="stylesheet" href="{% static 'signup.css' %}">
-</head>
+    <link rel="stylesheet" href="{% static 'login.css' %}" />
+  </head>
 
-<body>
-    <div class="form-container">
-        <h2>Register</h2>
-        <form method="POST" action="{% url 'signup' %}">
-            {% csrf_token %}
-            <div class="form-group">
-                {% for message in messages %}
-                <p class="message">{{ message }}</p>
-                {% endfor %}
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" placeholder="Enter your username" required>
-            </div>
-            <div class="form-group">
-                <label for="firstname">First Name:</label>
-                <input type="text" id="firstname" name="firstname" placeholder="Enter your first name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="lastname">Last Name:</label>
-                <input type="text" id="lastname" name="lastname" placeholder="Enter your last name" required>
-            </div>
-            
-            <div class="form-group">
-                <label for="email">Email Address:</label>
-                <input type="email" id="email" name="email" placeholder="Enter your email" required>
-            </div>
-            
-            <p id="checkpassword" style="color: red;"></p>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" placeholder="Enter your password" required>
-                <div id="password-container">
-                <img src="{%static 'show.png'%}" id="visible" class="passwordvisibility" alt="eye" >
-                <img src="{%static 'hide.png'%}" class="passwordvisibility" id="notvisible" alt="eye" >
-            </div>
-            </div>
-            <div class="form-group">
-                <label for="password2">Confirm Password:</label>
-                
-                <input type="password" id="password2" name="password2" placeholder="Confirm your password" required>
-                <div id="password-container2">
-                <img src="{%static 'show.png'%}" id="visible2" class="passwordvisibility" alt="eye" >
-                <img src="{%static 'hide.png'%}"  id="notvisible2" class="passwordvisibility" alt="eye" >
-                </div>
-            </div>
-            
-            <div class="form-group">
-                <label for="role">Role:</label>
-                <select id="role" name="role" required>
-                    <option value="doctor">Doctor</option>
-                    <option value="patient">Patient</option>
-                    <option value="admin">Admin</option>
-                </select>
-            </div>
-  
-            
-            <button type="submit">Register</button>
-        </form>
-        <p>Already have an account? <a href="{%url 'login'%}">Log in</a></p>
+  <body>
+    <div class="login-container">
+      <div class="login-header">
+        <h1>Create Account</h1>
+        <p>Join our community today</p>
+      </div>
+
+      <form method="POST" action="{% url 'signup' %}" class="signup-form">
+        {% csrf_token %}
+
+        <div class="input-group">
+          <input type="text" id="username" name="username" required />
+          <label for="username">Username</label>
+        </div>
+
+        <div class="input-group">
+          <input type="text" id="firstname" name="firstname" required />
+          <label for="firstname">First Name</label>
+        </div>
+
+        <div class="input-group">
+          <input type="text" id="lastname" name="lastname" required />
+          <label for="lastname">Last Name</label>
+        </div>
+
+        <div class="input-group">
+          <input type="email" id="email" name="email" required />
+          <label for="email">Email Address</label>
+        </div>
+        <!-- In your signup page HTML -->
+        <div class="input-group">
+          <input type="password" id="password" name="password" required />
+          <label for="password">Password</label>
+          <div class="password-toggle">
+            <img
+              src="{% static 'show.png' %}"
+              class="toggle-icon visible"
+              alt="Show password"
+            />
+            <img
+              src="{% static 'hide.png' %}"
+              class="toggle-icon not-visible"
+              alt="Hide password"
+            />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <input type="password" id="password2" name="password2" required />
+          <label for="password2">Confirm Password</label>
+          <div class="password-toggle">
+            <img
+              src="{% static 'show.png' %}"
+              class="toggle-icon visible2"
+              alt="Show password"
+            />
+            <img
+              src="{% static 'hide.png' %}"
+              class="toggle-icon not-visible2"
+              alt="Hide password"
+            />
+          </div>
+        </div>
+        <div class="input-group">
+          <select id="role" name="role" required>
+            <option value="doctor">Doctor</option>
+            <option value="patient">Patient</option>
+            <option value="admin">Admin</option>
+          </select>
+          <label for="role" class="select-label">Role</label>
+        </div>
+
+        {% for message in messages %}
+        <p class="message">{{ message }}</p>
+        {% endfor %}
+
+        <button type="submit" class="login-button">Register</button>
+      </form>
+
+      <div class="signup-link">
+        Already have an account? <a href="{% url 'login' %}">Login here</a>
+      </div>
     </div>
 
+    <!-- Keep your existing JavaScript, just add these CSS additions -->
+    <style>
+      /* Add these to your login.css */
+      .signup-form {
+        margin-top: 20px;
+      }
+
+      .password-toggle {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+      }
+
+      .toggle-icon {
+        width: 20px;
+        height: 20px;
+        opacity: 0.6;
+      }
+
+      select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 100%;
+        padding: 15px;
+        border: none;
+        background: #f0f0f0;
+        border-radius: 10px;
+        font-size: 16px;
+      }
+
+      .select-label {
+        position: absolute;
+        left: 15px;
+        top: -10px;
+        font-size: 12px;
+        color: #667eea;
+      }
+
+      .message {
+        color: #e74c3c;
+        margin: 10px 0;
+        text-align: center;
+        font-size: 14px;
+      }
+    </style>
     <script>
-        const password1 = document.querySelector('#password');
-        const password2 = document.querySelector('#password2');
-        const checkPassword = document.querySelector('#checkpassword');
-        const button = document.querySelector('button');
-        const passwordVisible=document.getElementById('visible');
-        const passwordVisible2=document.getElementById('visible2');
-        const notPasswordVisible=document.getElementById('notvisible');
-        const notPasswordVisible2=document.getElementById('notvisible2');
-        const passwordButton=document.getElementById('password-container')
-        const inputFields = document.querySelectorAll('input:not(#password):not(#password2)');
-        const passwordButton2=document.getElementById('password-container2');
+      const password1 = document.querySelector("#password");
+      const password2 = document.querySelector("#password2");
+      const checkPassword = document.querySelector("#checkpassword");
+      const button = document.querySelector("button");
+      const passwordVisible = document.getElementById("visible");
+      const passwordVisible2 = document.getElementById("visible2");
+      const notPasswordVisible = document.getElementById("notvisible");
+      const notPasswordVisible2 = document.getElementById("notvisible2");
+      const passwordButton = document.getElementById("password-container");
+      const inputFields = document.querySelectorAll(
+        "input:not(#password):not(#password2)"
+      );
+      const passwordButton2 = document.getElementById("password-container2");
+      let allFieldsFilled = true;
+      button.style.backgroundColor = "#D3D3D3";
+
+      const checkAllFieldsFilled = () => {
         let allFieldsFilled = true;
-        button.style.backgroundColor = '#D3D3D3'; 
-
-        const checkAllFieldsFilled=()=>{
-            let allFieldsFilled = true;
-    inputFields.forEach((input) => {
-        if (input.value.trim() === '') {
+        inputFields.forEach((input) => {
+          if (input.value.trim() === "") {
             allFieldsFilled = false;
-        }
-    });
+          }
+        });
 
-    // Update the button style based on whether all fields are filled
-    if (allFieldsFilled) {
-        button.style.backgroundColor = '#4CAF50'; // Active color
-        button.disabled = false; // Enable the button
-    } else {
-        button.style.backgroundColor = '#D3D3D3'; // Disabled color
-        button.disabled = true; // Disable the button
-    }
+        // Update the button style based on whether all fields are filled
+        if (allFieldsFilled) {
+          button.style.backgroundColor = "#4CAF50"; // Active color
+          button.disabled = false; // Enable the button
+        } else {
+          button.style.backgroundColor = "#D3D3D3"; // Disabled color
+          button.disabled = true; // Disable the button
         }
-inputFields.forEach((input) => {
-  input.addEventListener('input',checkAllFieldsFilled)
-})
+      };
+      inputFields.forEach((input) => {
+        input.addEventListener("input", checkAllFieldsFilled);
+      });
 
-        function validatePassword() {
-            if (password1.value !== password2.value) {
-                checkPassword.textContent = 'Passwords do not match';
-                button.disabled = true;
-            } else {
-                checkPassword.textContent = '';
-                button.disabled = false;
-            }
+      function validatePassword() {
+        if (password1.value !== password2.value) {
+          checkPassword.textContent = "Passwords do not match";
+          button.disabled = true;
+        } else {
+          checkPassword.textContent = "";
+          button.disabled = false;
         }
-        const togglePasswordVisibility=()=>{
-            if (password1.type==='password'){
-                console.log("it is a password")
-                password1.type='text';
-                passwordVisible.style.display='none';
-                notPasswordVisible.style.display='block';
-                
-            }
-            else{
-                password1.type='password';
-                passwordVisible.style.display='block';
-                notPasswordVisible.style.display='none';
-            }
+      }
+      const togglePassword = (inputId, visibleClass, notVisibleClass) => {
+        const input = document.getElementById(inputId);
+        const visible = document.querySelector(`.${visibleClass}`);
+        const notVisible = document.querySelector(`.${notVisibleClass}`);
+
+        if (input.type === "password") {
+          input.type = "text";
+          visible.style.display = "none";
+          notVisible.style.display = "block";
+        } else {
+          input.type = "password";
+          visible.style.display = "block";
+          notVisible.style.display = "none";
         }
-        const togglePasswordVisibility2=()=>{
-            if (password2.type==='password'){
-                password2.type='text';
-                passwordVisible2.style.display='none';
-                notPasswordVisible2.style.display='block';
-                
-            }
-            else{
-                password2.type='password';
-                passwordVisible2.style.display='block';
-                notPasswordVisible2.style.display='none';
-            }
-        }
-        passwordButton.addEventListener('click', togglePasswordVisibility);
-        passwordButton2.addEventListener('click', togglePasswordVisibility2);
-        password1.addEventListener('input', validatePassword);
-        password2.addEventListener('input', validatePassword);
+      };
+
+      document
+        .querySelector(".password-toggle")
+        .addEventListener("click", () => {
+          togglePassword("password", "visible", "not-visible");
+        });
+
+      document
+        .querySelectorAll(".password-toggle")[1]
+        .addEventListener("click", () => {
+          togglePassword("password2", "visible2", "not-visible2");
+        });
+      ssword1.addEventListener("input", validatePassword);
+      password2.addEventListener("input", validatePassword);
     </script>
-</body>
+  </body>
 </html>
