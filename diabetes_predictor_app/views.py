@@ -18,6 +18,9 @@ model_path = "diabetes_predictor_app/ml_models/diabetes_model.pkl"
 with open(model_path, "rb") as file:
     model = pickle.load(file)
 
+def index(request):
+    return render(request, 'index.html')
+
 def patient_detail(request:HttpRequest, patient_id:int):
     patient=get_object_or_404(Patient, id=patient_id)
     print(patient.user.email)
@@ -59,7 +62,8 @@ def login(request:HttpRequest):
         if user is not None:
             auth_login(request, user)  # Use auth_login to avoid conflict with view name
             if request.user.role=='patient':
-                return redirect('/')
+                print("USer is a patient")
+                return redirect('predict')
             else:
                 
                 return redirect('doctor')  # Redirect to the name of the URL mapped to the index view
@@ -195,7 +199,7 @@ def signup(request):
 @login_required(login_url="login")
 def predict_diabetes(request):
     if request.user.role=='patient':
-        
+        print("Hello")
         if request.method == 'POST':
             form = DiabetesForm(request.POST)
             name = request.POST.get('Name')
@@ -248,7 +252,7 @@ def predict_diabetes(request):
         else:
             form = DiabetesForm()
 
-        return render(request, 'index.html', {'form': form})
+        return render(request, 'prediction_form.html', {'form': form})
     else:
         messages.error(request, "You need to login as a patient")
         return redirect("wronguser")

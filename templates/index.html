@@ -1,127 +1,322 @@
+<!-- index.html -->
+ {%load static%}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diabetes Prediction Form</title>
-    <style>
-        /* Reset some default styles */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+    <title>Predicare - Diabetes Risk Assessment</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="{%static 'index.css'%}">
+    <link rel="icon" type="image/svg+xml" href="{% static 'favicon.svg' %}">
 
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-        }
-
-        /* Form container */
-        .form-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Form title */
-        .form-container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        /* Form fields */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group input[type="number"],
-        .form-group input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        .form-group input[type="number"]:focus,
-        .form-group input[type="text"]:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
-        }
-
-        /* Submit button */
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 18px;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .submit-btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
 </head>
 <body>
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="container">
+            <a href="#" class="logo">
+                <i class="fas fa-heartbeat"></i> Predicare
+            </a>
+            
+            <div class="nav-links">
+                <a href="#how-it-works">How It Works</a>
+                <a href="#why-us">Why Us</a>
+                <a href="#testimonials">Stories</a>
+                <a href="#faq">FAQ</a>
+                <button class="cta-nav">Start Assessment</button>
+            </div>
 
-<div class="form-container">
-    <h2>Diabetes Prediction Form</h2>
-    <form method="post">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <input type="text" name="Name" id="Name" placeholder="Name">
+            <button class="hamburger">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
-        <div class="form-group">
-            {{ form.Pregnancies }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.Glucose }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.BloodPressure }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.SkinThickness }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.Insulin }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.BMI }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.DiabetesPedigreeFunction }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.Age }}
-        </div>
-        
-        <button type="submit" class="submit-btn">Predict</button>
-    </form>
-</div>
+    </nav>
 
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>Know Your Diabetes Risk in <span class="highlight">5 Minutes</span></h1>
+                <p class="subhead">AI-powered assessment backed by medical experts</p>
+                <button id="assessment" class="cta-main">
+                    <i class="fas fa-play"></i> Start Free Assessment
+                </button>
+                <div class="trust-badge">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>100% Private & Secure</span>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <img src="#" alt="Diabetes Risk Analysis Interface" class="hero-image">
+                <div class="risk-meter">
+                    <div class="needle"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How It Works -->
+    <section id="how-it-works" class="steps">
+        <div class="container">
+            <h2>Simple 3-Step Process</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-icon">1</div>
+                    <h3>Quick Questions</h3>
+                    <p>Share basic health information (takes 2 minutes)</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">2</div>
+                    <h3>AI Analysis</h3>
+                    <p>Our algorithm evaluates 15+ risk factors</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-icon">3</div>
+                    <h3>Get Results</h3>
+                    <p>Personalized report with prevention tips</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section id="why-us" class="features" data-animate>
+        <div class="container">
+            <h2>Why Trust Predicare?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <i class="fas fa-brain"></i>
+                    <h3>Smart AI Detection</h3>
+                    <p>94% accurate prediction model validated by NIH studies</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-user-md"></i>
+                    <h3>Expert Reviewed</h3>
+                    <p>All recommendations approved by endocrinologists</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-lock"></i>
+                    <h3>Military-Grade Security</h3>
+                    <p>HIPAA compliant data protection</p>
+                </div>
+                <div class="feature-card">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Any Device</h3>
+                    <p>Full mobile compatibility</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials -->
+    <section id="testimonials" class="testimonials" data-animate>
+        <div class="container">
+            <h2>Real Success Stories</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="quote-icon">“</div>
+                    <p class="quote">Caught my prediabetes early! Made lifestyle changes that dropped my A1C by 1.2%</p>
+                    <div class="author">
+                        <img src="{%static 'sarah.png'%}" alt="Sarah Johnson">
+                        <div class="info">
+                            <h4>Sarah Johnson</h4>
+                            <p>Age 42, Teacher</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="quote-icon">“</div>
+                    <p class="quote">The doctor insights helped me reverse my risk factors in 6 months</p>
+                    <div class="author">
+                        <img src="{%static 'michael.jpg'%}" alt="Michael Chen">
+                        <div class="info">
+                            <h4>Michael Chen</h4>
+                            <p>Age 38, Software Engineer</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Your Health Can't Wait</h2>
+            <p class="cta-sub">Take control now - early detection saves lives</p>
+            <button id="free-assessment" class="cta-main">
+                <i class="fas fa-play"></i> Start Free Assessment
+            </button>
+        </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="faq">
+        <div class="container">
+            <h2>Common Questions</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How accurate is the assessment?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Our AI model achieves 94% accuracy based on clinical trials...</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How accurate is the assessment?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Our AI model achieves 94% accuracy based on clinical trials...</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How accurate is the assessment?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Our AI model achieves 94% accuracy based on clinical trials...</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-question">
+                        How accurate is the assessment?
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    <div class="faq-answer">
+                        <p>Our AI model achieves 94% accuracy based on clinical trials...</p>
+                    </div>
+                </div>
+                <!-- Add 3 more FAQ items -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h4>Predicare</h4>
+                    <p>Empowering healthier lives through AI</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col">
+                    <h4>Company</h4>
+                    <a href="#">About Us</a>
+                    <a href="#">Careers</a>
+                    <a href="#">Press</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">Medical Disclaimer</a>
+                </div>
+                <div class="footer-col">
+                    <h4>Newsletter</h4>
+                    <form class="newsletter-form">
+                        <input type="email" placeholder="Enter your email">
+                        <button type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
+            <div class="copyright">
+                © 2025 Predicare. FDA-registered medical device.
+            </div>
+        </div>
+    </footer>
+
+    <script >
+        // script.js
+document.addEventListener('DOMContentLoaded', () => {
+    // Mobile Menu
+    const hamburger = document.querySelector('.hamburger');
+    const navLinks = document.querySelector('.nav-links');
+
+    hamburger.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
+        hamburger.classList.toggle('active');
+    });
+
+    const animateOnScroll = () => {
+    const elements = document.querySelectorAll('[data-animate]');
+    elements.forEach(el => {
+      const elementTop = el.getBoundingClientRect().top;
+      const elementVisible = 150;
+      
+      if (elementTop < window.innerHeight - elementVisible) {
+        el.classList.add('animate');
+      }
+    });
+  };
+
+  // Initial check
+  animateOnScroll();
+
+  // Listen for scroll
+  window.addEventListener('scroll', animateOnScroll);
+
+  // Risk Meter Animation
+  const riskMeter = document.querySelector('.risk-meter');
+  if (riskMeter) {
+    setInterval(() => {
+      riskMeter.style.transform = `rotate(${Math.random() * 10 - 5}deg)`;
+    }, 3000);
+  }
+
+  //Start assessment
+ document.querySelector('#assessment').addEventListener('click', function(){
+    window.location.href='/predict'
+ })
+
+    // FAQ Accordion
+    document.querySelectorAll('.faq-question').forEach(button => {
+        button.addEventListener('click', () => {
+            const answer = button.nextElementSibling;
+            const isOpen = button.classList.toggle('active');
+            
+            if (isOpen) {
+                answer.style.display = 'block';
+                answer.style.height = answer.scrollHeight + 'px';
+            } else {
+                answer.style.height = '0';
+                setTimeout(() => answer.style.display = 'none', 300);
+            }
+        });
+    });
+
+    // Smooth Scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            target.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+        });
+    });
+
+    // Sticky Navbar
+    window.addEventListener('scroll', () => {
+        const navbar = document.querySelector('.navbar');
+        if (window.scrollY > 50) {
+            navbar.classList.add('scrolled');
+        } else {
+            navbar.classList.remove('scrolled');
+        }
+    });
+});
+    </script>
 </body>
 </html>
