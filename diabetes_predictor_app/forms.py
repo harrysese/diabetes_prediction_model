@@ -1,6 +1,11 @@
 from django import forms
 
 class DiabetesForm(forms.Form):
+    Name = forms.CharField(
+        label='Name',
+        max_length=150,
+        widget=forms.TextInput(attrs={'placeholder': 'Enter your name'})
+    )
     Pregnancies = forms.IntegerField(
         label='',  # Removes label
         widget=forms.NumberInput(attrs={

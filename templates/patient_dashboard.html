@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    {% load static %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patient Dashboard - PrediCare</title>
+    <link rel="stylesheet" href="{% static 'patient_dashboard.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <i class="fas fa-heartbeat"></i>
+            <span>PrediCare</span>
+        </div>
+        <div class="navbar-links">
+            <a href="#overview" class="nav-link active">
+                <i class="fas fa-home"></i>
+                <span>Overview</span>
+            </a>
+            <a href="#metrics" class="nav-link">
+                <i class="fas fa-chart-bar"></i>
+                <span>Metrics</span>
+            </a>
+            <a href="#tests" class="nav-link">
+                <i class="fas fa-vial"></i>
+                <span>Tests</span>
+            </a>
+            <div class="user-menu">
+                <button class="user-btn">
+                    <i class="fas fa-user-circle"></i>
+                    <span>{{ request.user.username }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-item">
+                        <i class="fas fa-user"></i>
+                        <span>Profile</span>
+                    </a>
+                    <a href="{% url 'logout' %}" class="dropdown-item">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="dashboard-container">
+        <!-- Health Summary -->
+        <section class="health-summary">
+            <div class="summary-card risk-level">
+                <h3>Current Risk Level</h3>
+                <div class="gauge-chart">
+                    <canvas id="riskGauge"></canvas>
+                </div>
+                <p class="risk-value">{{ latest_test.Prediction|floatformat:1 }}%</p>
+            </div>
+            
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <i class="fas fa-tint"></i>
+                    <div>
+                        <h4>Avg. Glucose</h4>
+                        <p>{{ avg_glucose|floatformat:0 }} mg/dL</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-weight"></i>
+                    <div>
+                        <h4>BMI</h4>
+                        <p>{{ latest_test.BMI|floatformat:1 }}</p>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-calendar-check"></i>
+                    <div>
+                        <h4>Next Checkup</h4>
+                        <p>{{ next_checkup|date:"M d" }}</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Health Metrics -->
+        <section id="metrics" class="dashboard-section">
+            <h2>Health Trends</h2>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <h4>Glucose History</h4>
+                    <canvas id="glucoseChart"></canvas>
+                </div>
+                <div class="metric-card">
+                    <h4>BMI Progression</h4>
+                    <canvas id="bmiChart"></canvas>
+                </div>
+                <div class="metric-card">
+                    <h4>Risk Factors</h4>
+                    <div class="risk-factors">
+                        <div class="factor {% if latest_test.BMI >= 25 %}high{% endif %}">
+                            <span>BMI</span>
+                            <div class="factor-bar">
+                                <div class="fill" style="width: {{ bmi_percent }}%"></div>
+                            </div>
+                        </div>
+                        <div class="factor {% if avg_glucose >= 140 %}high{% endif %}">
+                            <span>Glucose</span>
+                            <div class="factor-bar">
+                                <div class="fill" style="width: {{ glucose_percent }}%"></div>
+                            </div>
+                        </div>
+                        <div class="factor {% if latest_test.Age >= 45 %}high{% endif %}">
+                            <span>Age</span>
+                            <div class="factor-bar">
+                                <div class="fill" style="width: {{ age_percent }}%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Test History -->
+        <section id="tests" class="dashboard-section">
+            <div class="section-header">
+                <h2>Test History</h2>
+                <a href="{% url 'predict' %}" class="cta-main">
+                    <i class="fas fa-plus"></i> New Test
+                </a>
+            </div>
+            <div class="test-history">
+                {% for test in tests %}
+                <div class="test-card">
+                    <div class="test-main">
+                        <div class="test-header">
+                            <span class="date">{{ test.created_at|date:"M d, Y" }}</span>
+                            <span class="status {{ test.Result|lower }}">{{ test.Result }}</span>
+                        </div>
+                        <div class="test-stats">
+                            <div class="stat">
+                                <span class="label">Glucose</span>
+                                <span class="value">{{ test.Glucose|floatformat:0 }}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="label">BMI</span>
+                                <span class="value">{{ test.BMI|floatformat:1 }}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="label">Age</span>
+                                <span class="value">{{ test.Age }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="test-details">
+                        <div class="detail">
+                            <span>Blood Pressure</span>
+                            <span>{{ test.BloodPressure|default:"-" }}</span>
+                        </div>
+                        <div class="detail">
+                            <span>Insulin</span>
+                            <span>{{ test.Insulin|default:"-" }}</span>
+                        </div>
+                        <div class="detail">
+                            <span>Pedigree Func</span>
+                            <span>{{ test.DiabetesPedigreeFunction|floatformat:2 }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fas fa-vial"></i>
+                    <p>No tests found. Start your first assessment!</p>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+    </main>
+    <p id="latest_test" hidden>{{ latest_test.Prediction|default:0 }}</p>
+    <p id="glucose_data" hidden>{{ glucose_data|safe }}</p>
+    <p id="bmi_data" hidden>{{ bmi_data|safe }}</p>
+    <p id="test_dates" hidden>{{ test_dates|safe }}</p>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{% static 'patient_dashboard.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Parse and convert values to proper types
+            const latestTest = Number(document.getElementById('latest_test').textContent);
+            // Parse JSON arrays and map to numbers
+            const glucoseData = JSON.parse(document.getElementById('glucose_data').textContent || '[]').map(Number);
+            const bmiData = JSON.parse(document.getElementById('bmi_data').textContent || '[]').map(Number);
+            // Parse test_dates (an array of strings)
+            const testDate = JSON.parse(document.getElementById('test_dates').textContent || '[]');
+        
+            console.log("latestTest:", latestTest);
+            console.log("glucoseData:", glucoseData);
+            console.log("bmiData:", bmiData);
+            console.log("testDate:", testDate);
+        
+            // Debug: Check if lengths match
+            if (testDate.length !== glucoseData.length || testDate.length !== bmiData.length) {
+                console.warn("Mismatch in lengths: testDate length =", testDate.length,
+                    "glucoseData length =", glucoseData.length,
+                    "bmiData length =", bmiData.length);
+                // Optionally, adjust or slice arrays here
+            }
+        
+            // Observer for fade-in effect on test cards
+            const testCards = document.querySelectorAll(".test-card");
+            const observer = new IntersectionObserver(
+                (entries, observer) => {
+                    entries.forEach((entry) => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add("in-view");
+                            observer.unobserve(entry.target);
+                        }
+                    });
+                },
+                { threshold: 0.2 }
+            );
+            testCards.forEach((card) => observer.observe(card));
+        
+            // Ensure testDate is valid before proceeding
+            if (!Array.isArray(testDate) || testDate.length === 0) {
+                console.error("testDate is empty or invalid:", testDate);
+                return;
+            }
+        
+            // Gauge Chart Configuration
+            const gaugeConfig = {
+                value: latestTest,
+                max: 100,
+                label: 'Risk Level',
+                showValue: true,
+                width: 200,
+                height: 200,
+                color: getComputedStyle(document.documentElement).getPropertyValue('--primary-color')
+            };
+            createRiskGauge('riskGauge', gaugeConfig);
+        
+            // Create line charts and pass the labels as a parameter
+            createLineChart('glucoseChart', {
+                label: 'Glucose (mg/dL)',
+                data: glucoseData,
+                borderColor: '#ef4444'
+            }, testDate);
+        
+            createLineChart('bmiChart', {
+                label: 'BMI',
+                data: bmiData,
+                borderColor: '#3b82f6'
+            }, testDate);
+        
+            // Test Card Toggle for expand/collapse
+            document.querySelectorAll('.test-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    card.classList.toggle('expanded');
+                });
+            });
+        });
+        function createRiskGauge(elementId, config) {
+    const canvas = document.getElementById(elementId);
+    // Destroy existing chart if present
+    if (canvas.chart) {
+        canvas.chart.destroy();
+    }
+    const chart = new Chart(canvas, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [config.value, config.max - config.value],
+                backgroundColor: [config.color, '#e2e8f0'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            circumference: 270,
+            rotation: 225,
+            cutout: '80%',
+            plugins: {
+                legend: { display: false },
+                tooltip: { enabled: false }
+            }
+        }
+    });
+    // Store the chart instance on the canvas
+    canvas.chart = chart;
+}
+
+function createLineChart(elementId, config, labels) {
+    const canvas = document.getElementById(elementId);
+    // Destroy existing chart if present
+    if (canvas.chart) {
+        canvas.chart.destroy();
+    }
+    const ctx = canvas.getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: config.label,
+                data: config.data,
+                borderColor: config.borderColor,
+                tension: 0.3,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: { y: { beginAtZero: false } }
+        }
+    });
+    // Store the chart instance on the canvas
+    canvas.chart = chart;
+}
+        </script>
+        
+</body>
+</html>

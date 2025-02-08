@@ -1,3 +1,6 @@
+from django.utils import timezone
+from datetime import timedelta
+import json
 import json
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
@@ -13,6 +16,9 @@ from django.core.mail import send_mail
 from .models import *
 from diabetes_predictor_app.email import send_remark_email
 from typing import List, Union
+
+from django.core.exceptions import ValidationError
+
 # Load the saved model
 model_path = "diabetes_predictor_app/ml_models/diabetes_model.pkl"
 with open(model_path, "rb") as file:
@@ -107,6 +113,43 @@ def submitremark(request, patient_id):
             'status':'error',
                 'message':'Invalid method!',
         }, status=400)
+        
+
+def patient(request):
+    if request.user.role=='patient':
+        patient = Patient.objects.filter(user=request.user).order_by('created_at')
+
+        if patient.exists():
+            latest_test = patient.last()
+        else:
+            latest_test = None
+
+        test_dates = [test.created_at.strftime("%Y-%m-%d") for test in patient if test.created_at]
+        glucose_data = [float(test.Glucose) for test in patient if test.Glucose is not None]
+        bmi_data = [float(test.BMI) for test in patient if test.BMI is not None]
+
+        avg_glucose = sum(glucose_data) / len(glucose_data) if glucose_data else 0
+        bmi_percent = min(100, (latest_test.BMI / 30) * 100) if latest_test and latest_test.BMI else 0
+        glucose_percent = min(100, (latest_test.Glucose / 200) * 100) if latest_test and latest_test.Glucose else 0
+        age_percent = min(100, (latest_test.Age / 80) * 100) if latest_test and latest_test.Age else 0
+
+        context = {
+            'tests': patient,
+            'latest_test': latest_test if latest_test else {},
+            'test_dates': json.dumps(test_dates),
+            'glucose_data': json.dumps(glucose_data),
+            'bmi_data': json.dumps(bmi_data),
+            'avg_glucose': avg_glucose,
+            'next_checkup': timezone.now() + timedelta(days=30),
+            'bmi_percent': bmi_percent,
+            'glucose_percent': glucose_percent,
+            'age_percent': age_percent,
+        }
+        return render(request, 'patient_dashboard.html', context)
+    else:
+        messages.info(request, 'You need to login as a patient')
+        return redirect('wronguser')
+        
 @login_required(login_url="login")
 def assign_patient(request, patient_id):
     if request.method == "POST" and request.user.role == "doctor":
@@ -197,64 +240,101 @@ def signup(request):
         return render(request, 'signup.html', {'patients':unassigned_patients})
 
 @login_required(login_url="login")
+
 def predict_diabetes(request):
-    if request.user.role=='patient':
-        print("Hello")
+    if request.user.role == 'patient':
         if request.method == 'POST':
             form = DiabetesForm(request.POST)
-            name = request.POST.get('Name')
-            
+            doctor = Patient.objects.filter(user=request.user).first()
+            print(doctor)
+            name=Patient.objects.filter(user=request.user).first()
             if form.is_valid():
+                print("Form is valid. Cleaned data:", form.cleaned_data)
                 # Extract and prepare data from form
-                data = [
-                    form.cleaned_data['Pregnancies'],
-                    form.cleaned_data['Glucose'],
-                    form.cleaned_data['BloodPressure'],
-                    form.cleaned_data['SkinThickness'],
-                    form.cleaned_data['Insulin'],
-                    form.cleaned_data['BMI'],
-                    form.cleaned_data['DiabetesPedigreeFunction'],
-                    form.cleaned_data['Age']
-                ]
+                # name = form.cleaned_data.get('Name', 'Unknown')
+                try:
+                    data = [
+                            int(form.cleaned_data['Pregnancies']),
+                            float(form.cleaned_data['Glucose']),
+                            float(form.cleaned_data['BloodPressure']),
+                            float(form.cleaned_data['SkinThickness']),
+                            float(form.cleaned_data['Insulin']),
+                            float(form.cleaned_data['BMI']),
+                            float(form.cleaned_data['DiabetesPedigreeFunction']),
+                            int(form.cleaned_data['Age'])
+                                                    ]
+                    print("Extracted data:", data)
+                except:
+                    print("Error while extracting data", str(e))
+                    return render(request, 'prediction_form.html',{'form':form})
+                # Predict probability and classify
+                prediction_proba = model.predict_proba([data])[0][1] * 100# Probability for diabetic class
+                prediction_proba = max(0, min(100, prediction_proba))# Clamp probability
+                print("Prediction probability:", prediction_proba)
+                LOW_RISK_THRESHOLD = 40
+                HIGH_RISK_THRESHOLD = 70
 
-                # Predict probability and class
-                prediction_proba = model.predict_proba([data])[0][1] * 100  # Probability for diabetic class
-                if prediction_proba < 40:
+                if prediction_proba < LOW_RISK_THRESHOLD:
                     result = "Likely not Diabetic"
-                elif 40 <= prediction_proba <= 70:
+                elif LOW_RISK_THRESHOLD <= prediction_proba <= HIGH_RISK_THRESHOLD:
                     result = "Borderline"
                 else:
                     result = "Likely Diabetic"
+                print("Prediction result:", result)
+                try:
+                    # Create and validate patient record
+                    Patient.objects.create(
+                        user=request.user,
+                        Name=name.user.first_name,
+                        Pregnancies=data[0],
+                        Glucose=data[1],
+                        BloodPressure=data[2],
+                        SkinThickness=data[3],
+                        Insulin=data[4],
+                        BMI=data[5],
+                        DiabetesPedigreeFunction=data[6],
+                        Age=data[7],
+                        Result=result,
+                        Prediction=float(round(prediction_proba, 2)),
+                        doctor=doctor.doctor
+                    )
+                    print("Patient object data:", vars(patient))
+                   
+                    print("Rendering result page with result:", result, "and probability:", prediction_proba)
 
-                # Save prediction to Patient model
-                Patient.objects.update_or_create(
-                    user=request.user,
-                    defaults={
-                        'Name': name,
-                        'Pregnancies': data[0],
-                        'Glucose': data[1],
-                        'BloodPressure': data[2],
-                        'SkinThickness': data[3],
-                        'Insulin': data[4],
-                        'BMI': data[5],
-                        'DiabetesPedigreeFunction': data[6],
-                        'Age': data[7],
-                        'Result': result,
-                        'Prediction': round(prediction_proba, 2)
-                    }
-                )
+                    messages.success(request, "Test result saved successfully!")
+                except ValidationError as e:
+                    messages.error(request, f"Invalid data: {e}")
+                    print('Invalid data')
+                    return render(request, 'prediction_form.html', {'form': form})
+                except Exception as e:
+                    messages.error(request, f"Failed to save test result: {str(e)}")
+                    print('failed to save test result')
+                    return redirect("patient_dashboard")
 
-                return render(request, 'result.html', {
-                    'result': result,
-                    'probability': round(prediction_proba, 2)
-                })
+                return redirect('patient_result')
+            else:
+                messages.error(request, "Form contains errors. Please check your input.")
+                print('form contains errors')
+                return render(request, 'prediction_form.html', {'form': form})
 
         else:
             form = DiabetesForm()
-
-        return render(request, 'prediction_form.html', {'form': form})
+            return render(request, 'prediction_form.html', {
+                'form': form,
+                'role': request.user.role
+            })
     else:
-        messages.error(request, "You need to login as a patient")
+        messages.error(request, "You need to log in as a patient")
         return redirect("wronguser")
+
+def result(request:HttpRequest):
+    patient=Patient.objects.filter(user=request.user).latest('created_at')
+    context={
+        'result':patient.Result,
+        'probability':patient.Prediction
+    }
+    return render(request, 'result.html', context=context)
+
 def wronguser(request):
     return render(request, 'wrong_user.html')

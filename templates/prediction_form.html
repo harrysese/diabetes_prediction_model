@@ -1,127 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diabetes Prediction Form</title>
-    <style>
-        /* Reset some default styles */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-        }
-
-        /* Form container */
-        .form-container {
-            width: 100%;
-            max-width: 400px;
-            padding: 20px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        /* Form title */
-        .form-container h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-        }
-
-        /* Form fields */
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .form-group input[type="number"],
-        .form-group input[type="text"] {
-            width: 100%;
-            padding: 10px;
-            font-size: 16px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            outline: none;
-        }
-
-        .form-group input[type="number"]:focus,
-        .form-group input[type="text"]:focus {
-            border-color: #007bff;
-            box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
-        }
-
-        /* Submit button */
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 18px;
-            color: #fff;
-            background-color: #007bff;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        .submit-btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
+    <title>Diabetes Risk Assessment</title>
+    <link rel="stylesheet" href="{% static 'prediction_form.css' %}">
 </head>
 <body>
+    <nav class="navbar">
+        <div class="brand">DiaCare</div>
+        <div class="nav-items">
+            <a href="{% url 'patient_dashboard' %}" class="nav-link">Dashboard</a>
+            <div class="user-menu">
+                <button class="user-btn">{{ request.user.username }} ▼</button>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-item">Profile</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item">Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
 
-<div class="form-container">
-    <h2>Diabetes Prediction Form</h2>
-    <form method="post">
-        {% csrf_token %}
-        
-        <div class="form-group">
-            <input type="text" name="Name" id="Name" placeholder="Name">
-        </div>
-        <div class="form-group">
-            {{ form.Pregnancies }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.Glucose }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.BloodPressure }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.SkinThickness }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.Insulin }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.BMI }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.DiabetesPedigreeFunction }}
-        </div>
-        
-        <div class="form-group">
-            {{ form.Age }}
-        </div>
-        
-        <button type="submit" class="submit-btn">Predict</button>
-    </form>
-</div>
+    <div class="form-container">
+        <h1>Diabetes Risk Assessment</h1>
+        <form method="post" class="assessment-form">
+            {% csrf_token %}
+            <!-- Form fields here -->
+             
+      
+      <div class="form-group">
+        <label for="Name">Name</label>
+        {{form.Name}}
+      </div>
+      <div class="form-group">
+        <label for="pregnancies">Pregnancies</label>
+        {{ form.Pregnancies }}
+      </div>
+      <div class="form-group">
+        <label for="glucose">Glucose</label>
+        {{ form.Glucose }}
+      </div>
+      <div class="form-group">
+        <label for="bloodPressure">Blood Pressure</label>
+        {{ form.BloodPressure }}
+      </div>
+      <div class="form-group">
+        <label for="skinThickness">Skin Thickness</label>
+        {{ form.SkinThickness }}
+      </div>
+      <div class="form-group">
+        <label for="insulin">Insulin</label>
+        {{ form.Insulin }}
+      </div>
+      <div class="form-group">
+        <label for="bmi">BMI</label>
+        {{ form.BMI }}
+      </div>
+      <div class="form-group">
+        <label for="dpf">Diabetes Pedigree Function</label>
+        {{ form.DiabetesPedigreeFunction }}
+      </div>
+      <div class="form-group">
+        <label for="age">Age</label>
+        {{ form.Age }}
+      </div>
+            <button type="submit" class="submit-btn">Get Assessment</button>
+        </form>
+    </div>
 
+
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+    // Mobile Menu Toggle
+    const mobileMenuBtn = document.createElement('button');
+    mobileMenuBtn.className = 'mobile-menu-btn';
+    mobileMenuBtn.innerHTML = '☰';
+    document.querySelector('.navbar').appendChild(mobileMenuBtn);
+
+    const navItems = document.querySelector('.nav-items');
+    
+    mobileMenuBtn.addEventListener('click', () => {
+        navItems.style.display = navItems.style.display === 'flex' ? 'none' : 'flex';
+    });
+
+    // Form Validation
+    const form = document.querySelector('.assessment-form');
+    
+    form.addEventListener('submit', (e) => {
+        let isValid = true;
+        
+        document.querySelectorAll('input, select').forEach(input => {
+            if (!input.value) {
+                input.classList.add('input-error');
+                isValid = false;
+                setTimeout(() => input.classList.remove('input-error'), 400);
+            }
+        });
+
+        if (!isValid) {
+            e.preventDefault();
+            form.classList.add('form-error');
+            setTimeout(() => form.classList.remove('form-error'), 400);
+        }
+    });
+
+    // Input Hover Effects
+    document.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('mouseenter', () => {
+            input.style.transform = 'translateY(-2px)';
+        });
+        
+        input.addEventListener('mouseleave', () => {
+            input.style.transform = 'translateY(0)';
+        });
+    });
+
+    // Auto-animate inputs on focus
+    document.querySelectorAll('input, select').forEach(input => {
+        input.addEventListener('focus', () => {
+            input.parentElement.style.transform = 'scale(1.02)';
+        });
+        
+        input.addEventListener('blur', () => {
+            input.parentElement.style.transform = 'scale(1)';
+        });
+    });
+});
+    </script>
 </body>
 </html>

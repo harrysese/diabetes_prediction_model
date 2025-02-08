@@ -27,10 +27,13 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 1rem 1.5rem;
+    padding: 0 1.5rem;
     
 }
-
+#nav-container{
+  display: flex;
+  justify-content: space-between;
+}
 /* Navbar */
 .navbar {
     background: var(--text-light);
@@ -373,6 +376,10 @@ footer {
     animation: fadeInUp 0.8s ease-out forwards;
   }
   
+  .hamburger{
+    display: none;
+  }
+
   .testimonial-card:nth-child(even) {
     transform: translateX(30px);
   }
@@ -454,7 +461,7 @@ footer {
         padding: 1rem;
         box-shadow: var(--shadow-md);
     }
-
+    .hamburger{display: block;}
     .nav-links.active {
         display: flex;
     }

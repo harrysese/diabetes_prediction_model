@@ -1,15 +1,98 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     {% load static %}
-    <title>Prediction Result</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Result</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="{% static 'result.css' %}">
 </head>
 <body>
-    <div>
-        <h2>Prediction Result: {{ result }} with a probability of {{ probability }}%</h2>
-        <p>Analyze your health metrics and try again if needed.</p>
-        <a href="{% url 'predict_diabetes' %}">Try Again</a>
-    </div>
+    <nav class="navbar">
+        <div class="brand">DiaCare</div>
+        <div class="nav-items">
+            <a href="{% url 'patient_dashboard' %}" class="nav-link">Dashboard</a>
+            <div class="user-menu">
+                <button class="user-btn">{{ request.user.username }} ▼</button>
+                <div class="dropdown">
+                    <a href="#" class="dropdown-item"><i class="fas fa-user-circle"></i> Profile</a>
+                    <a href="{% url 'logout' %}" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="result-container">
+        <div class="result-summary {{ result|lower }}">
+            {% if result == 'Likely Diabetic' %}
+                <i class="result-icon fas fa-exclamation-triangle"></i>
+            {% elif result == 'Borderline' %}
+                <i class="result-icon fas fa-exclamation-circle"></i>
+            {% else %}
+                <i class="result-icon fas fa-check-circle"></i>
+            {% endif %}
+            <h2>Test Result: {{ result }}</h2>
+            <p class="probability">{{ probability }}%</p>
+        </div>
+
+        <section class="recommendations">
+            <h3><i class="fas fa-heartbeat"></i> Health Recommendations</h3>
+            <div class="recommendation-content">
+                {% if probability > 70 %}
+                <div class="recommendation-card critical">
+                    <i class="card-icon fas fa-burn"></i>
+                    <h4>Immediate Actions</h4>
+                    <ul>
+                        <li>Consult a healthcare professional within 48 hours</li>
+                        <li>Monitor blood sugar levels twice daily</li>
+                        <li>Follow prescribed medication regimen</li>
+                    </ul>
+                </div>
+                {% elif probability >= 40 %}
+                <div class="recommendation-card borderline">
+                    <i class="card-icon fas fa-clipboard-list"></i>
+                    <h4>Health Monitoring</h4>
+                    <ul>
+                        <li>Maintain a balanced diet</li>
+                        <li>Exercise regularly (150 minutes per week)</li>
+                        <li>Monitor blood sugar levels weekly</li>
+                    </ul>
+                </div>
+                {% else %}
+                <div class="recommendation-card preventive">
+                    <i class="card-icon fas fa-shield-virus"></i>
+                    <h4>Preventive Measures</h4>
+                    <ul>
+                        <li>Maintain BMI between 18.5-24.9</li>
+                        <li>Engage in regular physical activity</li>
+                        <li>Annual glucose tolerance test</li>
+                    </ul>
+                </div>
+                {% endif %}
+
+                <div class="recommendation-card diet">
+                    <i class="card-icon fas fa-leaf"></i>
+                    <h4>Dietary Guidelines</h4>
+                    <ul>
+                        <li>Choose whole grains over refined carbs</li>
+                        <li>Increase fiber intake to 25-30g/day</li>
+                        <li>Limit added sugars to <25g/day</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <div class="actions">
+            <a href="{% url 'predict' %}" class="btn retest-btn">
+                <i class="fas fa-redo-alt"></i> Retake Test
+            </a>
+            <a href="{% url 'patient_dashboard' %}" class="btn dashboard-btn">
+                <i class="fas fa-tachometer-alt"></i> View Dashboard
+            </a>
+        </div>
+    </main>
+
+    <script src="{% static 'patient_result.js' %}"></script>
 </body>
 </html>

@@ -14,7 +14,7 @@
 <body>
     <!-- Navbar -->
     <nav class="navbar">
-        <div class="container">
+        <div id="nav-container" class="container">
             <a href="#" class="logo">
                 <i class="fas fa-heartbeat"></i> Predicare
             </a>
@@ -24,8 +24,8 @@
                 <a href="#why-us">Why Us</a>
                 <a href="#testimonials">Stories</a>
                 <a href="#faq">FAQ</a>
-                <button class="cta-nav">Start Assessment</button>
             </div>
+            <button class="cta-nav">Start Assessment</button>
 
             <button class="hamburger">
                 <i class="fas fa-bars"></i>
@@ -276,6 +276,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   //Start assessment
  document.querySelector('#assessment').addEventListener('click', function(){
+    window.location.href='/predict'
+ })
+ document.querySelector('.cta-nav').addEventListener('click', function(){
     window.location.href='/predict'
  })
 

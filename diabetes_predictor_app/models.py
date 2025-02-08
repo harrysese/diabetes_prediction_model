@@ -28,9 +28,10 @@ class DoctorProfile(models.Model):
     specialisation=models.TextField(max_length=50)
     def __str__(self):
         return self.user.first_name
+    
 class Patient(models.Model):
     Name=models.CharField(max_length=40)
-    user=models.OneToOneField(User, on_delete=models.CASCADE)
+    user=models.ForeignKey(User, on_delete=models.CASCADE)
     doctor = models.ForeignKey(DoctorProfile, on_delete=models.SET_NULL, null=True, blank=True)
     Pregnancies=models.IntegerField(null=True, blank=True)
     Glucose=models.FloatField(null=True, blank=True)
