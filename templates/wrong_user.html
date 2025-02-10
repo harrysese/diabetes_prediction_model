@@ -4,38 +4,117 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ERROR</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        body{
+        /* General Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #ff6b6b, #ff4757);
             display: flex;
-            height: 100vh;
             justify-content: center;
             align-items: center;
-
+            height: 100vh;
+            color: #fff;
         }
-        h1{
-            color: red;
 
+        /* Error Container */
+        section {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+            animation: fadeIn 0.5s ease-in-out;
         }
-        a{
-            padding: 10px 25px;
-            background-color: black;
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Error Message */
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Return Button */
+        a {
+            display: inline-block;
+            padding: 12px 30px;
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 8px;
-            color: red;
+            color: #fff;
             text-decoration: none;
-            text-align: center;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
         }
-        section{
-            text-align: center;
-            transition: 0.3s;
+
+        a:hover {
+            background: rgba(0, 0, 0, 0.9);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        a:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Icon Animation */
+        .error-icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #fff;
+            animation: bounce 1.5s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% {
+                transform: translateY(0);
+            }
+            40% {
+                transform: translateY(-20px);
+            }
+            60% {
+                transform: translateY(-10px);
+            }
         }
     </style>
 </head>
 <body>
     <section>
-        {%for message in messages%}
-    <h1>{{message}}</h1>
-    {%endfor%}
-    <a href="/login">Return to Login Page</a>
-</section>
+        <!-- Error Icon -->
+        <div class="error-icon">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+
+        <!-- Error Messages -->
+        {% for message in messages %}
+            <h1>{{ message }}</h1>
+        {% endfor %}
+
+        <!-- Return to Login Button -->
+        <a href="/login">
+            <i class="fas fa-arrow-left"></i> Return to Login Page
+        </a>
+    </section>
 </body>
 </html>

@@ -1,54 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f6f8fa;">
-    <div style="max-width: 600px; margin: 20px auto; background: #ffffff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <!-- Header -->
-        <div style="background: #2A5C82; padding: 24px; border-radius: 8px 8px 0 0;">
-            <h1 style="color: #fff; margin: 0; font-size: 24px;">
-                <span style="vertical-align: middle;">📬</span> New Medical Remark
-            </h1>
-        </div>
-
-        <!-- Content -->
-        <div style="padding: 32px 24px;">
-            <div style="margin-bottom: 24px;">
-                <span style="font-size: 18px; color: #2D3748;">👋 Hello {{ patient_name }},</span>
-            </div>
-
-            <div style="background: #f8f9fa; border-left: 4px solid #5BA4E6; padding: 16px; margin: 20px 0; border-radius: 4px;">
-                <div style="display: flex; align-items: center; margin-bottom: 16px;">
-                    <div style="background: #5BA4E6; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                        <span style="color: #fff;">👨⚕️</span>
-                    </div>
-                    <div>
-                        <h3 style="margin: 0; color: #2A5C82;">Dr. {{ doctor_name }}</h3>
-                        <p style="margin: 0; color: #718096; font-size: 14px;">Healthcare Provider</p>
-                    </div>
-                </div>
-
-                <div style="color: #4a5568; font-size: 16px; line-height: 1.6; padding-left: 12px; border-left: 2px solid #e2e8f0;">
-                    “{{ remark }}”
-                </div>
-            </div>
-
-            <div style="text-align: center; margin-top: 32px;">
-                <a href="#" style="display: inline-block; background: #5BA4E6; color: #fff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 500;">
-                    📩 Reply to Doctor
-                </a>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div style="background: #2A5C82; padding: 24px; text-align: center; border-radius: 0 0 8px 8px;">
-            <p style="margin: 0; color: #fff; font-size: 14px;">
-                Your Health Matters • <strong>DiaCare Team</strong><br>
-                <span style="opacity: 0.9;">24/7 Support: support@diacare.com</span>
-            </p>
-        </div>
-    </div>
+<body style="margin: 0; padding: 0; background: #f8fafc;">
+  <div class="email-container">
+    <center>
+      <img src="https://yourdomain.com/static/logo.svg" alt="Logo" class="email-logo">
+      
+      <div class="email-content">
+        <h2 style="color: #1e293b; margin-bottom: 1rem;">Password Reset Request</h2>
+        <p style="color: #64748b; line-height: 1.6;">
+          Hello there! We received a request to reset your password. Click the button below
+          to set up a new password for your account.
+        </p>
+        
+        <a href="{{ protocol }}://{{ domain }}{% url 'password_reset_confirm' uidb64=uid token=token %}" 
+           class="email-button">
+           Reset Password
+        </a>
+        
+        <p style="color: #64748b; font-size: 0.875rem;">
+          If you didn't request this password reset, you can safely ignore this email.
+          The link will expire in 24 hours.
+        </p>
+      </div>
+      
+      <footer style="margin-top: 2rem; color: #94a3b8; font-size: 0.75rem;">
+        © 2024 Your Company Name. All rights reserved.
+      </footer>
+    </center>
+  </div>
 </body>
 </html>

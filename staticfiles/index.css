@@ -378,6 +378,8 @@ footer {
   
   .hamburger{
     display: none;
+    border: none;
+    background: none;
   }
 
   .testimonial-card:nth-child(even) {
@@ -440,7 +442,21 @@ footer {
   .needle {
     animation: pulse 2s ease-in-out infinite;
   }
-  
+  .mobile-only{
+    display: none;
+  }
+  .desktop-only{
+    display: block;
+  }
+  .cta{
+    padding: 2rem 0;
+    display: flex
+;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+  }
   /* Mobile Optimization */
   @media (prefers-reduced-motion: reduce) {
     * {
@@ -450,6 +466,12 @@ footer {
   }
 /* Responsive Design */
 @media (max-width: 768px) {
+  .mobile-only{
+    display: block;
+  }
+  .desktop-only{
+    display: none;
+  }
     .nav-links {
         display: none;
         position: absolute;
@@ -461,6 +483,9 @@ footer {
         padding: 1rem;
         box-shadow: var(--shadow-md);
     }
+  
+
+  
     .hamburger{display: block;}
     .nav-links.active {
         display: flex;

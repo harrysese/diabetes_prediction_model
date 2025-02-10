@@ -6,169 +6,265 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Doctor Dashboard</title>
     <link rel="stylesheet" href="{% static 'doctor_home.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-gray-100">
-
-<div class="dashboard-container">
-        <!-- Header Section -->
-        <header class="dashboard-header">
-            <div class="header-content">
-                <h1 class="welcome-message">👋 Welcome, Dr. {{ doctor }}</h1>
-                <div class="header-actions">
-                    <div class="metric-chip">
-                        <span class="metric-label">Patients Under Care</span>
-                        <span class="metric-value pulse">{{ total_number_of_patients }}</span>
+<body>
+        <!-- Navigation -->
+        <nav class="dashboard-nav">
+            <div class="nav-brand">
+                <i class="fas fa-hospital"></i>
+                <span>PrediCare</span>
+            </div>
+            <div class="nav-actions">
+                <button class="nav-btn" onclick="showNotification()">
+                    <i class="fas fa-bell"></i>
+                    <span class="badge">3</span>
+                </button>
+            </div>
+        </nav>
+    
+        <div class="dashboard-container">
+            <!-- Header Section -->
+            <header class="dashboard-header">
+                <div class="header-content">
+                    <h1 class="welcome-message">
+                        <i class="fas fa-user-md"></i>
+                        Welcome, Dr. {{ doctor }}
+                    </h1>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon">
+                                <i class="fas fa-user-injured"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-label">Total Patients</span>
+                                <span class="metric-value pulse">{{ total_number_of_patients }}</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon warning">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-label">High Risk Cases</span>
+                                <span class="metric-value">12</span>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon secondary">
+                                <i class="fas fa-comment-medical"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-label">Pending Notes</span>
+                                <span class="metric-value">3</span>
+                            </div>
+                        </div>
                     </div>
-                    <button class="action-btn new-patient-btn">
-                        <span class="icon-plus">+</span> New Case
+                </div>
+            </header>
+    
+            <!-- Patient Grid Section -->
+            <main class="dashboard-main">
+                <section class="patient-section">
+                    <div class="section-header">
+                        <h2><i class="fas fa-procedures"></i> My Patients</h2>
+                        <div class="search-filter">
+                            <div class="search-bar">
+                                <input type="text" placeholder="Search patients..." class="search-input">
+                                <button class="search-btn">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <div class="filter-group">
+                                <select class="risk-filter">
+                                    <option value="all">All Risks</option>
+                                    <option value="low">Likely Not Diabetic</option>
+                                    <option value="borderline">Borderline</option>
+                                    <option value="high">Likely Diabetic</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="patient-grid">
+                        {% for patient in patients %}
+                        <div class="patient-card">
+                            <div class="patient-header">
+                                <div class="avatar">
+                                    <span>{{ patient.initials }}</span>
+                                </div>
+                                <div class="patient-info">
+                                    <h3>{{ patient.user }}</h3>
+                                    <p class="patient-meta">
+                                        <i class="fas fa-birthday-cake"></i>
+                                        Age {{ patient.Age }}
+                                    </p>
+                                </div>
+                                <span class="status-indicator {{ patient.Result|lower }}"></span>
+                            </div>
+                            
+                            <div class="patient-details">
+                                <div class="detail-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span class="detail-value">{{ patient.created_at }}</span>
+                                </div>
+                                <div class="detail-item">
+                                    <i class="fas fa-chart-line"></i>
+                                    <span class="risk-level {{ patient.Result|lower }}">{{ patient.Result }}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="patient-actions">
+                                <button class="action-btn view-btn" onclick="viewPatient('{{ patient.id }}')">
+                                    <i class="fas fa-file-medical"></i>
+                                    Full History
+                                </button>
+                                <button class="action-btn remark-btn" onclick="openRemarkModal('{{ patient.id }}')">
+                                    <i class="fas fa-comment-medical"></i>
+                                    Add Note
+                                </button>
+                            </div>
+                            
+                            {% if patient.remark %}
+                            <div class="patient-notes">
+                                <div class="note-bubble">
+                                    <i class="fas fa-sticky-note"></i>
+                                    {{ patient.remark|truncatechars:40 }}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <div class="empty-state">
+                            <img src="{% static 'empty-state.svg' %}" alt="No patients" class="empty-illustration">
+                            <p>No patients currently under your care</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+    
+                    <!-- Unassigned Cases Section -->
+                    <div class="section-header">
+                        <h2><i class="fas fa-inbox"></i> Unassigned Cases</h2>
+                        <span class="badge">{{ unassigned_patients|length }} pending</span>
+                    </div>
+                    
+                    <div class="unassigned-grid">
+                        {% for patient in unassigned_patients %}
+                        <div class="case-card">
+                            <div class="case-header">
+                                <div class="case-urgency {{ patient.Result|lower }}"></div>
+                                <h4>{{ patient.user }}</h4>
+                                <p class="case-meta">
+                                    <i class="fas fa-birthday-cake"></i>
+                                    Age {{ patient.Age }}
+                                </p>
+                            </div>
+                            <div class="case-preview">
+                                <span class="prediction-tag {{ patient.Result|lower }}">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    {{ patient.Result }}
+                                </span>
+                                <button class="action-btn assign-btn" onclick="assignPatient('{{ patient.id }}')">
+                                    <i class="fas fa-user-plus"></i>
+                                    Claim Case
+                                </button>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="empty-state">
+                            <p>All cases have been assigned 🎉</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+    
+                <!-- Analytics Section -->
+                <section class="analytics-section">
+                    <div class="chart-container">
+                        <canvas id="riskDistributionChart"></canvas>
+                    </div>
+                </section>
+            </main>
+        </div>
+    
+        <!-- Modals (Keep existing functionality) -->
+        <div id="assignmentModal" class="modal">
+            <div class="modal-content">
+                <h4><i class="fas fa-user-plus"></i> Confirm Assignment</h4>
+                <p>Are you sure you want to assign this patient to yourself?</p>
+                <div class="modal-actions">
+                    <button class="action-btn cancel-btn" onclick="closeModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="action-btn confirm-btn" onclick="confirmAssignment()">
+                        <i class="fas fa-check"></i> Confirm
                     </button>
                 </div>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="dashboard-main">
-            <!-- Patient Grid -->
-            <section class="patient-grid">
-                <!-- My Patients Section -->
-                <div class="section-header">
-                    <h2>🩺 My Patients</h2>
-                    <div class="search-bar">
-                        <input type="text" placeholder="Search patients..." class="search-input">
-                        <span class="search-icon">🔍</span>
-                    </div>
+        </div>
+    
+        <div id="remarkModal" class="modal">
+            <div class="modal-content">
+                <h4><i class="fas fa-comment-medical"></i> Add Remark</h4>
+                <textarea id="remarkText" placeholder="Enter your remark here..." rows="4"></textarea>
+                <div class="modal-actions">
+                    <button class="action-btn cancel-btn" onclick="closeRemarkModal()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                    <button class="action-btn confirm-btn" onclick="submitRemark()">
+                        <i class="fas fa-check"></i> Submit
+                    </button>
                 </div>
-                
-                <div class="grid-container">
-                    {% for patient in patients %}
-                    <div class="patient-card">
-                        <div class="patient-header">
-                            <div class="avatar">{{patient.initials}}
-                            </div>
-                            <div class="patient-info">
-                                <h3>{{ patient.user }}</h3>
-                                <p class="patient-age">Age {{ patient.Age }}</p>
-                            </div>
-                            <span class="status-indicator {{ patient.Result|lower }}"></span>
-                        </div>
-                        
-                        <div class="patient-details">
-                            <div class="detail-item">
-                                <span class="detail-label">Last Check</span>
-                                <span class="detail-value">{{patient.created_at}}</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Risk Level</span>
-                                <span class="risk-level {{ patient.Result|lower }}">{{ patient.Result }}</span>
-                            </div>
-                        </div>
-                        
-                        <div class="patient-actions">
-                            <button class="action-btn view-btn" onclick="viewPatient('{{ patient.id }}')">
-                                Full History
-                            </button>
-                            <button class="action-btn remark-btn" onclick="openRemarkModal('{{ patient.id }}')">
-                                Add Note
-                            </button>
-                        </div>
-                        
-                        {% if patient.remark %}
-                        <div class="patient-notes">
-                            <div class="note-bubble">
-                                <span class="note-icon">📝</span>
-                                {{ patient.remark|truncatechars:40 }}
-                            </div>
-                        </div>
-                        {% endif %}
-                    </div>
-                    {% empty %}
-                    <div class="empty-state">
-                        <img src="{% static 'empty-state.svg' %}" alt="No patients" class="empty-illustration">
-                        <p>No patients currently under your care</p>
-                    </div>
-                    {% endfor %}
-                </div>
-
-                <!-- Unassigned Patients Section -->
-                <div class="section-header">
-                    <h2>📥 Unassigned Cases</h2>
-                    <span class="badge">{{ unassigned_patients|length }} pending</span>
-                </div>
-                
-                <div class="unassigned-list">
-                    {% for patient in unassigned_patients %}
-                    <div class="case-card">
-                        <div class="case-header">
-                            <div class="case-urgency"></div>
-                            <h4>{{ patient.user }}</h4>
-                            <span class="case-age">Age {{ patient.Age }}</span>
-                        </div>
-                        <div class="case-preview">
-                            <span class="prediction-tag {{ patient.Result|lower }}">
-                                {{ patient.Result }}
-                            </span>
-                            <button class="action-btn assign-btn" 
-                                    onclick="assignPatient('{{ patient.id }}')">
-                                Claim Case
-                            </button>
-                        </div>
-                    </div>
-                    {% empty %}
-                    <div class="empty-state">
-                        <p>All cases have been assigned 🎉</p>
-                    </div>
-                    {% endfor %}
-                </div>
-            </section>
-
-            <!-- Patient Preview Sidebar -->
-            <aside class="patient-preview">
-                <div class="preview-header">
-                    <h3>Selected Patient</h3>
-                    <span class="close-preview">×</span>
-                </div>
-                <div class="preview-content">
-                    <!-- Dynamic content loaded via JS -->
-                </div>
-            </aside>
-        </main>
-    </div>
-
-<div id="assignmentModal" class="modal">
-    <div class="modal-content">
-            <h4>Confirm Assignment</h4>
-            <p>Are you sure you want to assign this patient to yourself?</p>
-            <div class="modal-actions">
-                <button class="action-btn cancel-btn" onclick="closeModal()">Cancel</button>
-                <button class="action-btn confirm-btn" onclick="confirmAssignment()">Confirm</button>
             </div>
         </div>
-</div>
-<!-- Remark Modal -->
-<div id="remarkModal" class="modal">
-    <div class="modal-content">
-        <h4>Add Remark</h4>
-        <textarea id="remarkText" placeholder="Enter your remark here..." rows="4" style="width: 100%; padding: 10px;"></textarea>
-        <div class="modal-actions">
-            <button class="action-btn cancel-btn" onclick="closeRemarkModal()">Cancel</button>
-            <button class="action-btn confirm-btn" onclick="submitRemark()">Submit</button>
-        </div>
-    </div>
-</div>
-
+    
 <script>
-let selectedPatientId = null;
+      // Add smooth scroll behavior
+      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+// Initialize Chart
+const ctx = document.getElementById('riskDistributionChart').getContext('2d');
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Low Risk', 'Borderline', 'High Risk'],
+        datasets: [{
+            data: [15, 8, 3],
+            backgroundColor: ['#10B981', '#F59E0B', '#EF4444']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: { position: 'bottom' },
+            tooltip: { enabled: true }
+        }
+    }
+});
 
+// Enhanced Search Functionality
+document.querySelector('.search-input').addEventListener('input', function(e) {
+    const term = e.target.value.toLowerCase();
+    document.querySelectorAll('.patient-card').forEach(card => {
+        const name = card.querySelector('h3').textContent.toLowerCase();
+        card.style.display = name.includes(term) ? 'block' : 'none';
+    });
+});
+
+// Original JavaScript Functions (Keep intact)
+let selectedPatientId = null;
 
 function assignPatient(patientId) {
     selectedPatientId = patientId;
-    document.getElementById('assignmentModal').style.display = 'block';
+    document.getElementById('assignmentModal').style.display = 'flex';
 }
-
-function closeModal() {
-    document.getElementById('assignmentModal').style.display = 'none';
-}
-
 
 function closeModal() {
     document.getElementById('assignmentModal').style.display = 'none';
@@ -177,6 +273,7 @@ function closeModal() {
 function viewPatient(patientId) {
     window.location.href = `/patient-detail/${patientId}`;
 }
+
 function confirmAssignment() {
     if (!selectedPatientId) return;
     
@@ -205,7 +302,7 @@ function confirmAssignment() {
 
 function openRemarkModal(patientId) {
     selectedPatientId = patientId;
-    document.getElementById('remarkModal').style.display = 'block';
+    document.getElementById('remarkModal').style.display = 'flex';
 }
 
 function closeRemarkModal() {
@@ -216,25 +313,20 @@ function closeRemarkModal() {
 function showToast(message, type = 'success') {
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.innerText = message;
+    toast.innerHTML = `
+        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        ${message}
+    `;
     document.body.appendChild(toast);
 
-    // Force reflow to ensure animation will trigger
-    void toast.offsetHeight;
-
-    // Show the toast by adding 'show' class
+    void toast.offsetHeight; // Trigger reflow
     toast.classList.add('show');
 
-    // Hide the toast after 3 seconds
     setTimeout(() => {
         toast.classList.remove('show');
-        setTimeout(() => {
-            toast.remove();
-        }, 300); // Time for fade-out transition
-    }, 3000); // Show time
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
-
-
 
 function submitRemark() {
     const remarkText = document.getElementById('remarkText').value;
@@ -243,12 +335,7 @@ function submitRemark() {
         return;
     }
 
-    if (!selectedPatientId) {
-        showToast('No patient selected.', 'error');
-        return;
-    }
-
-    closeRemarkModal(); // Close the modal right away
+    closeRemarkModal();
 
     fetch(`/submit-remark/${selectedPatientId}`, {
         method: 'POST',
@@ -262,7 +349,7 @@ function submitRemark() {
     .then(data => {
         if (data.status === 'success') {
             showToast('Remark submitted successfully!', 'success');
-            setTimeout(()=>{location.reload();},11000);
+            setTimeout(() => location.reload(), 1500);
         } else {
             showToast('Error: ' + data.message, 'error');
         }
@@ -279,7 +366,7 @@ function getCookie(name) {
         const cookies = document.cookie.split(';');
         for (let i = 0; i < cookies.length; i++) {
             const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            if (cookie.startsWith(name + '=')) {
                 cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                 break;
             }

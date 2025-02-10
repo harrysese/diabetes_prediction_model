@@ -24,9 +24,10 @@
                 <a href="#why-us">Why Us</a>
                 <a href="#testimonials">Stories</a>
                 <a href="#faq">FAQ</a>
+                <button class="cta-nav mobile-only">Start Assessment</button>
             </div>
-            <button class="cta-nav">Start Assessment</button>
-
+            <button class="cta-nav desktop-only">Start Assessment</button>
+            
             <button class="hamburger">
                 <i class="fas fa-bars"></i>
             </button>
@@ -142,7 +143,7 @@
 
     <!-- Final CTA -->
     <section class="cta-section">
-        <div class="container">
+        <div class="container cta">
             <h2>Your Health Can't Wait</h2>
             <p class="cta-sub">Take control now - early detection saves lives</p>
             <button id="free-assessment" class="cta-main">
@@ -235,16 +236,25 @@
             </div>
         </div>
     </footer>
-
+    
     <script >
         // script.js
-document.addEventListener('DOMContentLoaded', () => {
-    // Mobile Menu
-    const hamburger = document.querySelector('.hamburger');
-    const navLinks = document.querySelector('.nav-links');
-
-    hamburger.addEventListener('click', () => {
-        navLinks.classList.toggle('active');
+        document.addEventListener('DOMContentLoaded', () => {
+            // Mobile Menu
+            const startAssessmentBtn=document.querySelector('.cta-nav')
+            const hamburger = document.querySelector('.hamburger');
+            const navLinks = document.querySelector('.nav-links');
+            
+            window.addEventListener('resize', () => {
+                if(window.innerWidth < 768){
+                    startAssessmentBtn.classList.add('navlinks');
+                } else {
+                    startAssessmentBtn.classList.remove('navlinks');
+                }
+            });
+            hamburger.addEventListener('click', () => {
+                navLinks.classList.toggle('active');
+                startAssessmentBtn.classList.toggle('active');
         hamburger.classList.toggle('active');
     });
 
@@ -293,7 +303,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 answer.style.height = answer.scrollHeight + 'px';
             } else {
                 answer.style.height = '0';
-                setTimeout(() => answer.style.display = 'none', 300);
+                setTimeout(() => answer.style.display = 'none', 1);
             }
         });
     });
@@ -320,6 +330,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+startAssessmentBtn.addEventListener('mouseover',function(){
+    console.log('hover')
+})
+
     </script>
 </body>
 </html>
