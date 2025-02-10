@@ -48,7 +48,7 @@
                             </div>
                             <div class="metric-info">
                                 <span class="metric-label">High Risk Cases</span>
-                                <span class="metric-value">12</span>
+                                <span class="metric-value">{{high_risk_patients}}</span>
                             </div>
                         </div>
                         <div class="metric-card">
@@ -116,7 +116,7 @@
                             </div>
                             
                             <div class="patient-actions">
-                                <button class="action-btn view-btn" onclick="viewPatient('{{ patient.id }}')">
+                                <button class="action-btn view-btn" onclick="viewPatient('{{ patient.user.id }}')">
                                     <i class="fas fa-file-medical"></i>
                                     Full History
                                 </button>

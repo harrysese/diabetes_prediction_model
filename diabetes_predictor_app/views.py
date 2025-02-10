@@ -1,7 +1,6 @@
 from django.utils import timezone
 from datetime import timedelta
 import json
-import json
 from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 import pickle
@@ -16,7 +15,7 @@ from django.core.mail import send_mail
 from .models import *
 from diabetes_predictor_app.email import send_remark_email
 from typing import List, Union
-
+from django.db.models import Min, Max, Avg
 from django.core.exceptions import ValidationError
 
 # Load the saved model
@@ -27,26 +26,24 @@ with open(model_path, "rb") as file:
 def index(request):
     return render(request, 'index.html')
 
-def patient_detail(request:HttpRequest, patient_id:int):
-    patient=get_object_or_404(Patient, id=patient_id)
-    print(patient.user.email)
-    print(patient.id
-          )
-    context={
-            'name':f"{patient.user.first_name} {patient.user.last_name}",
-            'pregnancies':patient.Pregnancies,
-            'glucose':patient.Glucose,
-            'bloodpressure':patient.BloodPressure,
-            'skinthickness':patient.SkinThickness,
-            'bmi':patient.BMI,
-            'insulin':patient.Insulin,
-            'age':patient.Age,
-            'diabetespedigreefunction':patient.DiabetesPedigreeFunction,
-            'result':patient.Result,
-            'remark':patient.remark,
-            'prediction': patient.Prediction,
-            'id':patient.id
-        }
+
+def patient_detail(request: HttpRequest, patient_id: int):
+    user = get_object_or_404(User, id=patient_id)
+    patients = Patient.objects.filter(user=user).order_by('-created_at')
+    print(patients)
+    # Prepare chart data
+    chart_data = {
+        'labels': [p.created_at.strftime("%Y-%m-%d") for p in patients],
+        'glucose': [p.Glucose for p in patients],
+        'bmi': [float(p.BMI) for p in patients],
+        'results': [p.Result for p in patients]
+    }
+    
+    context = {
+        'user': user,
+        'patients': patients,
+        'chart_data': chart_data,
+    }
     return render(request, 'patient_detail.html', context)
     
 
@@ -179,27 +176,51 @@ def assign_patient(request, patient_id):
     
 @login_required(login_url="login")
 def doctor_page(request):
-    if request.user.role=="doctor":
-         # Access the doctor's profile
+    if request.user.role != "doctor":
+        messages.error(request, "You need to log in as a Doctor")
+        return redirect("wronguser")
+
+    try:
+        # Access the doctor's profile
         doctor_profile = request.user.doctorprofile
-        
-        # Get all patients assigned to this doctor
-        patients = Patient.objects.filter(doctor=doctor_profile)
-        unassigned_patients=Patient.objects.filter(doctor__isnull=True)
-        total_number_of_patients=patients.count()
+
+        # Get all patients assigned to this doctor (distinct by user)
+        patient_ids = (
+            Patient.objects.filter(doctor=doctor_profile)
+            .values('user')  # Group by user
+            .annotate(id=Max('id'))  # Keep the Latest patient record for each user
+            .values_list('id', flat=True)  # Extract the IDs of distinct patients
+        )
+
+        # Fetch the full patient objects for the distinct IDs
+        patients = Patient.objects.filter(id__in=patient_ids).select_related('user')
+        #Get High Risk Patients by checking if their prediction is greater than 70%
+        high_risk_patients=Patient.objects.filter(Prediction__gt=70, id__in=patient_ids).select_related('user')
+        # Add initials to each patient dynamically
         for patient in patients:
             patient.initials = f"{patient.user.first_name[0].upper()}{patient.user.last_name[0].upper()}"
+
+        # Get unassigned patients (patients without a doctor)
+        unassigned_patients = Patient.objects.filter(doctor__isnull=True).select_related('user')
+
+        # Calculate total number of patients assigned to the doctor
+        total_number_of_patients = patients.count()
+
+        # Prepare context for rendering
         context = {
             'patients': patients,
-            'doctor':doctor_profile,
-            'total_number_of_patients':total_number_of_patients,
-            'unassigned_patients':unassigned_patients,
+            'doctor': doctor_profile,
+            'total_number_of_patients': total_number_of_patients,
+            'unassigned_patients': unassigned_patients,
+            'high_risk_patients':high_risk_patients.count()
         }
-        return render(request, 'doctor_home.html', context)  
-    else:
-        messages.error(request, "You need to login as a Doctor")
-        return redirect("wronguser")
-        
+
+        return render(request, 'doctor_home.html', context)
+
+    except AttributeError:
+        # Handle cases where `request.user.doctorprofile` does not exist
+        messages.error(request, "Doctor profile not found. Please contact support.")
+        return redirect('wronguser')
       
 
 

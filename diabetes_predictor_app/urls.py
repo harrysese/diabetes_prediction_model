@@ -15,6 +15,8 @@ urlpatterns=[
     path('submit-remark/<int:patient_id>', submitremark, name='submit_remark'),
     path('wronguser',wronguser, name='wronguser'),
       # Password reset URLs
+      
+      
     path('password-reset/', auth_views.PasswordResetView.as_view(
         template_name='password_reset.html',html_email_template_name='registration/password_reset_email.html'
 
