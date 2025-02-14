@@ -15,6 +15,7 @@
             <i class="fas fa-heartbeat"></i>
             <span>PrediCare</span>
         </div>
+        <div class="navbar-collapse">
         <div class="navbar-links">
             <a href="#overview" class="nav-link active">
                 <i class="fas fa-home"></i>
@@ -45,13 +46,23 @@
                     </a>
                 </div>
             </div>
+            <div class="theme-toggle">
+                <button id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                    <i class="fas fa-sun"></i>
+                </button>
+            </div>
         </div>
+    </div>
+        <button class="hamburger">
+            <i class="fas fa-bars"></i>
+        </button>
     </nav>
 
     <!-- Main Content -->
     <main class="dashboard-container">
         <!-- Health Summary -->
-        <section class="health-summary">
+        <section  id='overview'class="health-summary">
             <div class="summary-card risk-level">
                 <h3>Current Risk Level</h3>
                 <div class="gauge-chart">
@@ -186,6 +197,87 @@
     <script src="{% static 'patient_dashboard.js' %}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            const hamburger = document.querySelector('.hamburger');
+    const navbarCollapse = document.querySelector('.navbar-collapse');
+    const navLinks = document.querySelectorAll('.nav-link');
+    const themeToggle = document.getElementById('themeToggle');
+    const html = document.documentElement;
+    
+    // Get stored theme or system preference
+    const storedTheme = localStorage.getItem('theme');
+    const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    
+    // Set initial theme
+    if (storedTheme) {
+        html.setAttribute('data-theme', storedTheme);
+    } else {
+        html.setAttribute('data-theme', systemIsDark ? 'dark' : 'light');
+    }
+
+    // Toggle theme
+    themeToggle.addEventListener('click', () => {
+        const currentTheme = html.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        html.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+    });
+
+    // Watch for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+        if (!localStorage.getItem('theme')) {
+            html.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+    });
+    // Toggle menu
+    hamburger.addEventListener('click', () => {
+        navbarCollapse.classList.toggle('active');
+        hamburger.querySelector('i').classList.toggle('fa-times');
+        document.querySelector('.navbar-links').style.display='flex'
+    });
+
+    // Close menu and update active state on link click
+    navLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Close mobile menu
+            navbarCollapse.classList.remove('active');
+            hamburger.querySelector('i').classList.remove('fa-times');
+            
+            // Remove active class from all links
+            navLinks.forEach(l => l.classList.remove('active'));
+            
+            // Add active class to clicked link
+            this.classList.add('active');
+        });
+    });
+
+    // Close menu on click outside
+    document.addEventListener('click', (e) => {
+        if (!e.target.closest('.navbar') && 
+            !e.target.closest('.navbar-collapse')) {
+            navbarCollapse.classList.remove('active');
+            hamburger.querySelector('i').classList.remove('fa-times');
+        }
+    });
+
+    // Update active link on scroll
+    window.addEventListener('scroll', () => {
+        const sections = document.querySelectorAll('.dashboard-section');
+        let current = '';
+        
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            if (pageYOffset >= sectionTop - 100) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        navLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href').includes(current)) {
+                link.classList.add('active');
+            }
+        });
+    });
             // Parse and convert values to proper types
             const latestTest = Number(document.getElementById('latest_test').textContent);
             // Parse JSON arrays and map to numbers

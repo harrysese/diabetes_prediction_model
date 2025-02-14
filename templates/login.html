@@ -25,6 +25,9 @@
         <div class="input-group">
             <input type="password" name="password" required>
             <label>Password</label>
+            {% for message in messages%}
+            {{message}}
+            {% endfor %}
         </div>
 
         <div class="remember-forgot">
@@ -40,7 +43,7 @@
             Don't have an account? <a href="{%url 'signup'%}">Sign Up</a>
         </div>
 
-        <div class="social-login">
+        <!-- <div class="social-login">
             <button type="button" class="social-button">
                 <img src="https://img.icons8.com/color/48/000000/google-logo.png" alt="Google">
             </button>
@@ -50,7 +53,7 @@
             <!-- <button type="button" class="social-button">
                 <img src="https://img.icons8.com/color/48/000000/apple-logo.png" alt="Apple">
             </button> -->
-        </div>
+        <!-- </div> --> 
     </form>
 </div>
 

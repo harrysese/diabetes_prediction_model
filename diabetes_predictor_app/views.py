@@ -66,12 +66,12 @@ def login(request:HttpRequest):
             auth_login(request, user)  # Use auth_login to avoid conflict with view name
             if request.user.role=='patient':
                 print("USer is a patient")
-                return redirect('predict')
+                return redirect('patient_dashboard')
             else:
                 
                 return redirect('doctor')  # Redirect to the name of the URL mapped to the index view
         else:
-            messages.info(request, 'Invalid Credentials')
+            messages.info(request, 'Incorrect username or password')
             return redirect('login')  # Redirect to the login URL or view name
     else:
         return render(request, 'login.html')
