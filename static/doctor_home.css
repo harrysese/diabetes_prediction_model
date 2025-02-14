@@ -1,10 +1,35 @@
 /* General Styles */
+:root {
+    --primary-color: #3498db;
+    --text-color: #2c3e50;
+    --bg-color: #f5f7fa;
+    --card-bg: rgba(255, 255, 255, 0.2);
+    --border-color: rgba(255, 255, 255, 0.3);
+    --glass-bg: rgba(255, 255, 255, 0.2);
+    --glass-border: rgba(255, 255, 255, 0.3);
+}
+
+[data-theme="dark"] {
+    --text-color: #f8f9fa;
+    --bg-color: #1a1d28;
+    --glass-bg: rgba(26, 29, 40, 1);
+    --card-bg: rgba(26, 29, 40, 1);
+    --border-color: rgba(255, 255, 255, 0.1);   
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --primary-color: #3b82f6;
+}
+
 body {
     font-family: 'Poppins', sans-serif;
     background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
     margin: 0;
     padding: 0;
     color: #333;
+
+    background: var(--bg-color);
+    color: var(--text-color);
+    transition: background 0.3s, color 0.3s;
+
 }
 
 /* Navigation Bar */
@@ -13,7 +38,6 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 1rem 2rem;
-    background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(74px);
     -webkit-backdrop-filter: blur(5px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.3);
@@ -21,6 +45,8 @@ body {
     position: sticky;
     top: 0;
     z-index: 1000;
+    background: var(--glass-bg);
+    border-color: var(--border-color);
 }
 
 .nav-brand {
@@ -63,6 +89,7 @@ body {
     border-radius: 50%;
     font-size: 0.8rem;
     margin-left: 0.5rem;
+    display: none;
 }
 
 /* Dashboard Container */
@@ -133,13 +160,13 @@ body {
 
 .metric-label {
     font-size: 1rem;
-    color: #555;
+    color: var(--text-color);
 }
 
 .metric-value {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #2c3e50;
+    color: var(--text-color);
 }
 
 .metric-value.pulse {
@@ -176,7 +203,7 @@ body {
 
 .section-header h2 {
     font-size: 1.5rem;
-    color: #2c3e50;
+    color: var(--text-color);
 }
 
 .section-header h2 i {
@@ -214,7 +241,8 @@ body {
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #2c3e50;
+    color: var(--text-color);
+
 }
 
 .filter-group select {
@@ -224,8 +252,9 @@ body {
     border: 1px solid rgba(255, 255, 255, 0.3);
     border-radius: 8px;
     padding: 0.5rem;
-    color: #2c3e50;
     cursor: pointer;
+    color: var(--text-color);
+
 }
 
 .patient-grid {
@@ -269,10 +298,30 @@ body {
     font-weight: 600;
 }
 
+.doctor-name{
+    cursor: pointer;
+}
+.menu{
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    bottom: 0;
+}
+.menu.active{
+    display: flex;
+}
+#logout{
+    background-color: var(--border-color);
+    border: var(--card-bg)
+}
+#logout:hover{
+cursor: pointer;
+}
 .patient-info h3 {
     font-size: 1.25rem;
-    color: #2c3e50;
     margin: 0;
+    color: var(--text-color);
+    
 }
 
 .patient-meta {
@@ -578,4 +627,91 @@ body {
 
 .toast.error {
     color: #e74c3c;
+}
+
+.metric-card, .patient-card, .case-card, .analytics-section {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.search-bar, .filter-group select {
+    background: var(--glass-bg);
+    border-color: var(--border-color);
+}
+
+.modal-content {
+    background: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+.theme-toggle {
+    margin-right: 1rem;
+}
+
+#themeToggle {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    position: relative;
+}
+
+#themeToggle i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s;
+}
+
+#themeToggle .fa-sun {
+    opacity: 0;
+}
+
+[data-theme="dark"] #themeToggle .fa-moon {
+    opacity: 0;
+}
+
+[data-theme="dark"] #themeToggle .fa-sun {
+    opacity: 1;
+}
+/* Remove glassmorphism effects in dark mode */
+[data-theme="dark"] .dashboard-nav,
+[data-theme="dark"] .metric-card,
+[data-theme="dark"] .patient-card,
+[data-theme="dark"] .case-card,
+[data-theme="dark"] .analytics-section,
+[data-theme="dark"] .patient-section,
+[data-theme="dark"] .search-bar,
+[data-theme="dark"] .dashboard-header,
+[data-theme="dark"] .filter-group select {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background: var(--card-bg);
+}
+
+/* Specific modal adjustments */
+[data-theme="dark"] .modal-content {
+    background: var(--card-bg);
+    backdrop-filter: none;
+}
+
+/* Toast notifications */
+[data-theme="dark"] .toast {
+    background: var(--card-bg);
+    backdrop-filter: none;
+    border: 1px solid var(--border-color);
+}
+
+/* Maintain glassmorphism in light mode */
+.dashboard-nav,
+.metric-card,
+.patient-card,
+.case-card,
+.analytics-section,
+.search-bar,
+.filter-group select {
+    transition: all 0.3s ease;
 }

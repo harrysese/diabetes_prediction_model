@@ -21,6 +21,18 @@
                     <i class="fas fa-bell"></i>
                     <span class="badge">3</span>
                 </button>
+                <div class="theme-toggle">
+                    <button id="themeToggle">
+                        <i class="fas fa-moon"></i>
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
+                <div class="avatar doctor-name">
+                    <span>{{ doctor_initials }}</span>
+                    <div class="menu">
+                        <button id="logout">Logout</button>
+                    </div>
+                </div>
             </div>
         </nav>
     
@@ -203,7 +215,7 @@
                 </div>
             </div>
         </div>
-    
+        
         <div id="remarkModal" class="modal">
             <div class="modal-content">
                 <h4><i class="fas fa-comment-medical"></i> Add Remark</h4>
@@ -218,19 +230,104 @@
                 </div>
             </div>
         </div>
-    
-<script>
-      // Add smooth scroll behavior
-      document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-            anchor.addEventListener('click', function (e) {
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href')).scrollIntoView({
-                    behavior: 'smooth'
+        
+        <script>
+            menu=document.querySelector('.menu')
+            logoutBtn=document.getElementById('logout')
+            doctorAvatar=document.querySelector('.doctor-name')
+            doctorAvatar.addEventListener('click', ()=>{
+                menu.classList.toggle('active')
+            })
+            logoutBtn.addEventListener('click', ()=>{
+                window.location.href='/logout'
+            })
+            // Add smooth scroll behavior
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
                 });
             });
-        });
-// Initialize Chart
+            
+            // Enhanced Search Functionality
+            document.querySelector('.search-input').addEventListener('input', function(e) {
+                const term = e.target.value.toLowerCase();
+                document.querySelectorAll('.patient-card').forEach(card => {
+                    const name = card.querySelector('h3').textContent.toLowerCase();
+                    card.style.display = name.includes(term) ? 'block' : 'none';
+                });
+            });
+            let selectedPatientId = null;
+            document.addEventListener("DOMContentLoaded", ()=>{
+                const themeToggle = document.getElementById('themeToggle');
+                const html = document.documentElement;
+                
+                // Theme detection
+                const storedTheme = localStorage.getItem('theme');
+                const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                
+                // Set initial theme
+                if (storedTheme) {
+                    html.setAttribute('data-theme', storedTheme);
+         } else {
+             html.setAttribute('data-theme', systemIsDark ? 'dark' : 'light');
+            }
+            
+            // Toggle theme
+         themeToggle.addEventListener('click', () => {
+             const currentTheme = html.getAttribute('data-theme');
+             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+             html.setAttribute('data-theme', newTheme);
+             localStorage.setItem('theme', newTheme);
+             updateChartColors(newTheme);
+         });
+     
+         // System theme change listener
+         window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+             if (!localStorage.getItem('theme')) {
+                 html.setAttribute('data-theme', e.matches ? 'dark' : 'light');
+        }
+    });
+
+         // Update chart colors
+    function updateChartColors(theme) {
+        const chart = Chart.getChart('riskDistributionChart');
+        if (chart) {
+            chart.options.plugins.legend.labels.color = theme === 'dark' ? '#f8f9fa' : '#2c3e50';
+            chart.update();
+        }
+    }
+});
+
+// Update chart initialization with theme-aware colors
 const ctx = document.getElementById('riskDistributionChart').getContext('2d');
+new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: ['Low Risk', 'Borderline', 'High Risk'],
+        datasets: [{
+            data: [15, 8, 3],
+            backgroundColor: ['#10B981', '#F59E0B', '#EF4444']
+        }]
+    },
+    options: {
+        responsive: true,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: document.documentElement.getAttribute('data-theme') === 'dark' ? '#f8f9fa' : '#2c3e50'
+                }
+            },
+            tooltip: { enabled: true }
+        }
+    }
+
+})
+// Initialize Chart
+// const ctx = document.getElementById('riskDistributionChart').getContext('2d');
 new Chart(ctx, {
     type: 'doughnut',
     data: {
@@ -249,17 +346,7 @@ new Chart(ctx, {
     }
 });
 
-// Enhanced Search Functionality
-document.querySelector('.search-input').addEventListener('input', function(e) {
-    const term = e.target.value.toLowerCase();
-    document.querySelectorAll('.patient-card').forEach(card => {
-        const name = card.querySelector('h3').textContent.toLowerCase();
-        card.style.display = name.includes(term) ? 'block' : 'none';
-    });
-});
-
 // Original JavaScript Functions (Keep intact)
-let selectedPatientId = null;
 
 function assignPatient(patientId) {
     selectedPatientId = patientId;

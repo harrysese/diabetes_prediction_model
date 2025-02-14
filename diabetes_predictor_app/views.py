@@ -79,7 +79,7 @@ def login(request:HttpRequest):
 
 def logout(request:HttpRequest):
     auth_logout(request)  # Use auth_logout to avoid conflict with view name
-    return redirect('login')  # Redirect to the login page or any other URL
+    return redirect('index')  # Redirect to the login page or any other URL
 
 
 def submitremark(request, patient_id):
@@ -205,14 +205,16 @@ def doctor_page(request):
 
         # Calculate total number of patients assigned to the doctor
         total_number_of_patients = patients.count()
-
+        doctor_initials=f'{request.user.first_name[0]}{request.user.last_name[0]}'
+        print(doctor_initials)
         # Prepare context for rendering
         context = {
             'patients': patients,
             'doctor': doctor_profile,
             'total_number_of_patients': total_number_of_patients,
             'unassigned_patients': unassigned_patients,
-            'high_risk_patients':high_risk_patients.count()
+            'high_risk_patients':high_risk_patients.count(),
+            'doctor_initials':doctor_initials,
         }
 
         return render(request, 'doctor_home.html', context)
