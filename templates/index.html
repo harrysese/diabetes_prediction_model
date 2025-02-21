@@ -24,16 +24,17 @@
                 <a href="#why-us">Why Us</a>
                 <a href="#testimonials">Stories</a>
                 <a href="#faq">FAQ</a>
-                <button class="cta-nav mobile-only">Start Assessment</button>
             </div>
-            <button class="cta-nav desktop-only">Start Assessment</button>
+            <div class="auth-links">
+                <a href="/login">Login</a>
+                <a href="/signup">Sign Up</a>
+            </div>
             
             <button class="hamburger">
                 <i class="fas fa-bars"></i>
             </button>
         </div>
     </nav>
-
     <!-- Hero Section -->
     <section class="hero">
         <div class="container">
@@ -239,12 +240,18 @@
     
     <script >
         // script.js
+      
         document.addEventListener('DOMContentLoaded', () => {
             // Mobile Menu
             const startAssessmentBtn=document.querySelector('.cta-nav')
             const hamburger = document.querySelector('.hamburger');
             const navLinks = document.querySelector('.nav-links');
-            
+            document.querySelectorAll('.cta-nav').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    window.location.href = '/predict';
+                });
+             });
+
             window.addEventListener('resize', () => {
                 if(window.innerWidth < 768){
                     startAssessmentBtn.classList.add('navlinks');
@@ -288,9 +295,6 @@
  document.querySelector('#assessment').addEventListener('click', function(){
     window.location.href='/predict'
  })
- document.querySelector('.cta-nav').addEventListener('click', function(){
-    window.location.href='/predict'
- })
 
     // FAQ Accordion
     document.querySelectorAll('.faq-question').forEach(button => {
@@ -299,12 +303,14 @@
             const isOpen = button.classList.toggle('active');
             
             if (isOpen) {
-                answer.style.display = 'block';
-                answer.style.height = answer.scrollHeight + 'px';
-            } else {
-                answer.style.height = '0';
-                setTimeout(() => answer.style.display = 'none', 1);
-            }
+                 answer.style.display = 'block';
+                 answer.style.height = answer.scrollHeight + 'px';
+                 }
+             else {
+                 answer.style.height = '0';
+                 setTimeout(() => answer.style.display = 'none', 300);
+                }
+
         });
     });
 
@@ -331,9 +337,9 @@
     });
 });
 
-startAssessmentBtn.addEventListener('mouseover',function(){
-    console.log('hover')
-})
+// startAssessmentBtn.addEventListener('mouseover',function(){
+//     console.log('hover')
+// })
 
     </script>
 </body>

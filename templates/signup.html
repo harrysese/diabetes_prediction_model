@@ -37,8 +37,8 @@
           <input type="email" id="email" name="email" required />
           <label for="email">Email Address</label>
         </div>
-        <!-- In your signup page HTML -->
-        <div class="input-group">
+
+        <div class="input-group" style="position: relative;">
           <input type="password" id="password" name="password" required />
           <label for="password">Password</label>
           <div class="password-toggle">
@@ -53,9 +53,10 @@
               alt="Hide password"
             />
           </div>
+          <span id="checkpassword" class="password-error"></span>
         </div>
 
-        <div class="input-group">
+        <div class="input-group" style="position: relative;">
           <input type="password" id="password2" name="password2" required />
           <label for="password2">Confirm Password</label>
           <div class="password-toggle">
@@ -71,6 +72,7 @@
             />
           </div>
         </div>
+
         <div class="input-group">
           <select id="role" name="role" required>
             <option value="doctor">Doctor</option>
@@ -84,7 +86,7 @@
         <p class="message">{{ message }}</p>
         {% endfor %}
 
-        <button type="submit" class="login-button">Register</button>
+        <button type="submit" class="login-button" disabled>Register</button>
       </form>
 
       <div class="signup-link">
@@ -92,7 +94,6 @@
       </div>
     </div>
 
-    <!-- Keep your existing JavaScript, just add these CSS additions -->
     <style>
       /* Add these to your login.css */
       .signup-form {
@@ -139,24 +140,39 @@
         text-align: center;
         font-size: 14px;
       }
+
+      .password-error {
+        display: block;
+        color: #e74c3c;
+        font-size: 12px;
+        margin-top: 5px;
+      }
     </style>
     <script>
-      const password1 = document.querySelector("#password");
-      const password2 = document.querySelector("#password2");
-      const checkPassword = document.querySelector("#checkpassword");
-      const button = document.querySelector("button");
-      const passwordVisible = document.getElementById("visible");
-      const passwordVisible2 = document.getElementById("visible2");
-      const notPasswordVisible = document.getElementById("notvisible");
-      const notPasswordVisible2 = document.getElementById("notvisible2");
-      const passwordButton = document.getElementById("password-container");
+      // Select necessary elements
+      const password1 = document.getElementById("password");
+      const password2 = document.getElementById("password2");
+      const checkPassword = document.getElementById("checkpassword");
+      const button = document.querySelector("button.login-button");
+      
+      // For toggle icons, using querySelector to select by class.
+      const visibleIcon = document.querySelector(".visible");
+      const notVisibleIcon = document.querySelector(".not-visible");
+      const visibleIcon2 = document.querySelector(".visible2");
+      const notVisibleIcon2 = document.querySelector(".not-visible2");
+      
+      // Hide the "hide" icons initially
+      notVisibleIcon.style.display = "none";
+      notVisibleIcon2.style.display = "none";
+      
+      // Get all input fields excluding password fields for checking if filled
       const inputFields = document.querySelectorAll(
         "input:not(#password):not(#password2)"
       );
-      const passwordButton2 = document.getElementById("password-container2");
-      let allFieldsFilled = true;
+      
+      // Disable the button initially (style set in HTML)
       button.style.backgroundColor = "#D3D3D3";
-
+      
       const checkAllFieldsFilled = () => {
         let allFieldsFilled = true;
         inputFields.forEach((input) => {
@@ -164,9 +180,13 @@
             allFieldsFilled = false;
           }
         });
-
-        // Update the button style based on whether all fields are filled
-        if (allFieldsFilled) {
+        // Also check that both password fields have values
+        if (password1.value.trim() === "" || password2.value.trim() === "") {
+          allFieldsFilled = false;
+        }
+      
+        // Update the button style based on whether all fields are filled and passwords match
+        if (allFieldsFilled && password1.value === password2.value) {
           button.style.backgroundColor = "#4CAF50"; // Active color
           button.disabled = false; // Enable the button
         } else {
@@ -174,24 +194,34 @@
           button.disabled = true; // Disable the button
         }
       };
+      
       inputFields.forEach((input) => {
         input.addEventListener("input", checkAllFieldsFilled);
       });
-
+      password1.addEventListener("input", () => {
+        validatePassword();
+        checkAllFieldsFilled();
+      });
+      password2.addEventListener("input", () => {
+        validatePassword();
+        checkAllFieldsFilled();
+      });
+      
       function validatePassword() {
         if (password1.value !== password2.value) {
           checkPassword.textContent = "Passwords do not match";
           button.disabled = true;
         } else {
           checkPassword.textContent = "";
-          button.disabled = false;
+          // Button enabling is handled in checkAllFieldsFilled
         }
       }
-      const togglePassword = (inputId, visibleClass, notVisibleClass) => {
+      
+      // Toggle password visibility
+      const togglePassword = (inputId, visibleSelector, notVisibleSelector) => {
         const input = document.getElementById(inputId);
-        const visible = document.querySelector(`.${visibleClass}`);
-        const notVisible = document.querySelector(`.${notVisibleClass}`);
-
+        const visible = document.querySelector(visibleSelector);
+        const notVisible = document.querySelector(notVisibleSelector);
         if (input.type === "password") {
           input.type = "text";
           visible.style.display = "none";
@@ -202,20 +232,17 @@
           notVisible.style.display = "none";
         }
       };
-
-      document
-        .querySelector(".password-toggle")
-        .addEventListener("click", () => {
-          togglePassword("password", "visible", "not-visible");
-        });
-
-      document
-        .querySelectorAll(".password-toggle")[1]
-        .addEventListener("click", () => {
-          togglePassword("password2", "visible2", "not-visible2");
-        });
-      ssword1.addEventListener("input", validatePassword);
-      password2.addEventListener("input", validatePassword);
+      
+      // Attach click events for the toggle icons.
+      // For the first password field:
+      document.querySelectorAll(".password-toggle")[0].addEventListener("click", () => {
+        togglePassword("password", ".visible", ".not-visible");
+      });
+      
+      // For the confirm password field:
+      document.querySelectorAll(".password-toggle")[1].addEventListener("click", () => {
+        togglePassword("password2", ".visible2", ".not-visible2");
+      });
     </script>
   </body>
 </html>
